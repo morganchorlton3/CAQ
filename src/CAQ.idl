@@ -1,8 +1,11 @@
 module CAQ {
 
+    typedef sequence<NoxReading> Log_of_alarm_readings;
+    typedef sequence<NoxReading> Set_of_readings;
+
     struct NoxReading {
-            long time;
-            long date;
+            long long time;
+            long long date;
             string station_name;
             long reading_value;
         };
@@ -16,9 +19,12 @@ module CAQ {
          void reset();
      } ;
 
-     interface RegionalCentre {
-          //void raise_alarm (in NoxReading alarmReading);
-          //Set_of_readings take_readings();
-          void add_monitoring_station(in string station_name, in string station_location, in string station_ior);
-     } ;
+    interface RegionalCentre {
+        readonly attribute string name;
+        readonly attribute string location_name;
+        readonly attribute Log_of_alarm_readings log;
+        void raise_alarm (in NoxReading alarmReading);
+        Set_of_readings take_readings();
+        void add_monitoring_station(in string station_name, in string station_location, in string station_ior);
+    };
 };
