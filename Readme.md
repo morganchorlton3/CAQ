@@ -18,3 +18,8 @@ Add Jacorb 3.9 lib folder
 When Running add VM Arguments:
 
     -Djacorb.log.default.verbosity=2
+    
+Generate IDL code
+
+    cd src
+    ~/src/jacorb-3.9/bin/idl CAQ.idl
