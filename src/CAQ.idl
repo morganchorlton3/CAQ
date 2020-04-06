@@ -1,0 +1,24 @@
+module CAQ {
+
+    struct NoxReading {
+            long time;
+            long date;
+            string station_name;
+            long reading_value;
+        };
+
+    interface MonitoringStation {
+         readonly attribute string station_name;
+         readonly attribute string location;
+         NoxReading get_reading();
+         void activate();
+         void deactivate();
+         void reset();
+     } ;
+
+     interface RegionalCentre {
+          //void raise_alarm (in NoxReading alarmReading);
+          //Set_of_readings take_readings();
+          void add_monitoring_station(in string station_name, in string station_location, in string station_ior);
+     } ;
+};
