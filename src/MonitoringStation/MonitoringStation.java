@@ -1,5 +1,8 @@
+package MonitoringStation;
+
 import CAQ.MonitoringStationPOA;
 import CAQ.NoxReading;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.Date;
@@ -12,15 +15,17 @@ import org.omg.PortableServer.POA;
 
 class MonitoringStationImpl extends MonitoringStationPOA {
 
+
     @Override
     public String station_name() {
-        return "Station 1";
+        return "LocalServer.Station 1";
     }
 
     @Override
     public String location() {
         return "Home";
     }
+
 
     @Override
     public NoxReading get_reading() {
@@ -34,13 +39,23 @@ class MonitoringStationImpl extends MonitoringStationPOA {
     }
 
     @Override
+    public boolean status() {
+        return true;
+    }
+
+    @Override
+    public void status(boolean arg) {
+        status(true);
+    }
+
+    @Override
     public void activate() {
 
     }
 
     @Override
     public void deactivate() {
-
+        status(false);
     }
 
     @Override
@@ -75,8 +90,9 @@ public class MonitoringStation {
             out.close();
             System.out.println("stringified_ior = " + stringified_ior);
 
-            System.out.println("HelloServer ready and waiting ...");
+            System.out.println("Monitoring LocalServer.Station ready and waiting ...");
 
+            //activate with local server
             // wait for invocations from clients
             orb.run();
         }
