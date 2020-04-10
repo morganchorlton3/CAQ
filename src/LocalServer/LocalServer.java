@@ -9,9 +9,12 @@ import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
-class RegionalCenterImpl extends RegionalCentrePOA {
+class RegionalCenterServant extends RegionalCentrePOA {
 
     List<Station> stationsList= new ArrayList<Station>();
+
+    private ORB orb;
+    private CAQ.MonitoringStation server;
 
     @Override
     public String name() {
@@ -23,14 +26,36 @@ class RegionalCenterImpl extends RegionalCentrePOA {
         return null;
     }
 
+    RegionalCenterServant(ORB orb_val) {
+        // store reference to ORB
+        orb = orb_val;
+
+        // look up the server
+        try {
+            // read in the 'stringified IOR'
+            BufferedReader in = new BufferedReader(new FileReader("server.ref"));
+            String stringified_ior = in.readLine();
+
+            // get object reference from stringified IOR
+            org.omg.CORBA.Object server_ref =
+                    orb.string_to_object(stringified_ior);
+            server = CAQ.MonitoringStationHelper.narrow(server_ref);
+        } catch (Exception e) {
+            System.out.println("ERROR : " + e) ;
+            e.printStackTrace(System.out);
+        }
+    }
+
     @Override
-    public void add_monitoring_station(String station_name, String station_location, String station_ior) {
+    public String add_monitoring_station(String station_name, String station_location, String station_ior) {
         Station station = new Station(station_name, station_location,station_ior);
         try{
             stationsList.add(station);
+            System.out.println(stationsList.get(0).toString());
         }catch (Exception e){
             e.printStackTrace();
         }
+        return station_name;
     }
 }
 
@@ -47,30 +72,27 @@ public class LocalServer {
             rootpoa.the_POAManager().activate();
 
             // create servant and register it with the ORB
-            RegionalCenterImpl RegionalCenterImpl = new RegionalCenterImpl();
+            RegionalCenterServant relayRef = new RegionalCenterServant(orb);
 
             // Get the 'stringified IOR'
-            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(RegionalCenterImpl);
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(relayRef);
             String stringified_ior = orb.object_to_string(ref);
 
             // Save IOR to file
-            BufferedWriter out = new BufferedWriter(new FileWriter("server.ref"));
+            BufferedWriter out = new BufferedWriter(new FileWriter("LocalServer.ref"));
             out.write(stringified_ior);
             out.close();
-            System.out.println("stringified_ior = " + stringified_ior);
-
-            System.out.println("Monitoring LocalServer.Station ready and waiting ...");
 
             // wait for invocations from clients
+            System.out.println("Local Server started.  Waiting for clients...");
             orb.run();
-        }
 
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("ERROR: " + e);
             e.printStackTrace(System.out);
         }
 
-        System.out.println("HelloServer Exiting ...");
+        System.out.println("Local Server Exiting ...");
 
     }
 }

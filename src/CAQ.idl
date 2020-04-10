@@ -11,7 +11,7 @@ module CAQ {
          readonly attribute string station_name;
          readonly attribute string location;
          NoxReading get_reading();
-         attribute boolean status;
+         void registerWithLocalServer(in string station_name, in string station_location, in string station_ior);
          void activate();
          void deactivate();
          void reset();

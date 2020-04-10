@@ -3,11 +3,14 @@ package MonitoringStation;
 import CAQ.MonitoringStationPOA;
 import CAQ.NoxReading;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Date;
 import java.util.Random;
 
+import LocalServer.LocalServer;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
@@ -18,7 +21,7 @@ class MonitoringStationImpl extends MonitoringStationPOA {
 
     @Override
     public String station_name() {
-        return "LocalServer.Station 1";
+        return "Station 1";
     }
 
     @Override
@@ -39,13 +42,8 @@ class MonitoringStationImpl extends MonitoringStationPOA {
     }
 
     @Override
-    public boolean status() {
-        return true;
-    }
+    public void registerWithLocalServer(String station_name, String station_location, String station_ior) {
 
-    @Override
-    public void status(boolean arg) {
-        status(true);
     }
 
     @Override
@@ -55,13 +53,14 @@ class MonitoringStationImpl extends MonitoringStationPOA {
 
     @Override
     public void deactivate() {
-        status(false);
+
     }
 
     @Override
     public void reset() {
 
     }
+
 
 }
 
@@ -90,7 +89,32 @@ public class MonitoringStation {
             out.close();
             System.out.println("stringified_ior = " + stringified_ior);
 
-            System.out.println("Monitoring LocalServer.Station ready and waiting ...");
+            System.out.println("Register with Local Sever");
+
+            try {
+                // read in the 'stringified IOR'
+                BufferedReader in = new BufferedReader(new FileReader("LocalServer.ref"));
+                String LocalServer_stringified_ior = in.readLine();
+                System.out.println("stringified_ior = " + stringified_ior);
+
+                // get object reference from stringified IOR
+                org.omg.CORBA.Object server_ref =
+                        orb.string_to_object(LocalServer_stringified_ior);
+                CAQ.RegionalCentre server =
+                        CAQ.RegionalCentreHelper.narrow(server_ref);
+
+                // call the Hello server object and print results
+                server.add_monitoring_station(sensorImpl.station_name(), sensorImpl.location(), stringified_ior);
+
+                System.out.println("Registered with Regional Center");
+
+            } catch (Exception e) {
+                System.out.println("ERROR : " + e) ;
+                e.printStackTrace(System.out);
+            }
+
+
+            System.out.println("Monitoring Station ready and waiting ...");
 
             //activate with local server
             // wait for invocations from clients
