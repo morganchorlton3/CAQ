@@ -1,20 +1,22 @@
 package LocalServer;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import CAQ.RegionalCentrePOA;
+import CAQ.Station;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
-class RegionalCenterServant extends RegionalCentrePOA {
-
-    List<Station> stationsList= new ArrayList<Station>();
+class MonitoringStationServant extends RegionalCentrePOA {
 
     private ORB orb;
     private CAQ.MonitoringStation server;
+
+    public Station[] station_list;
 
     @Override
     public String name() {
@@ -26,7 +28,17 @@ class RegionalCenterServant extends RegionalCentrePOA {
         return null;
     }
 
-    RegionalCenterServant(ORB orb_val) {
+    @Override
+    public Station[] getStationList() {
+        return station_list;
+    }
+
+    @Override
+    public void addStation(Station station_object) {
+        station_list.
+    }
+
+    MonitoringStationServant(ORB orb_val) {
         // store reference to ORB
         orb = orb_val;
 
@@ -47,15 +59,15 @@ class RegionalCenterServant extends RegionalCentrePOA {
     }
 
     @Override
-    public String add_monitoring_station(String station_name, String station_location, String station_ior) {
-        Station station = new Station(station_name, station_location,station_ior);
+    public void add_monitoring_station(String station_name, String station_location, String station_ior) {
+        CAQ.Station station = new CAQ.Station(station_name, station_location,station_ior);
         try{
-            stationsList.add(station);
-            System.out.println(stationsList.get(0).toString());
+            //add(station);
+            //Testing
+            //System.out.println(stationsList.get(0).toString());
         }catch (Exception e){
             e.printStackTrace();
         }
-        return station_name;
     }
 }
 
@@ -72,7 +84,7 @@ public class LocalServer {
             rootpoa.the_POAManager().activate();
 
             // create servant and register it with the ORB
-            RegionalCenterServant relayRef = new RegionalCenterServant(orb);
+            MonitoringStationServant relayRef = new MonitoringStationServant(orb);
 
             // Get the 'stringified IOR'
             org.omg.CORBA.Object ref = rootpoa.servant_to_reference(relayRef);
@@ -85,6 +97,9 @@ public class LocalServer {
 
             // wait for invocations from clients
             System.out.println("Local Server started.  Waiting for clients...");
+
+
+
             orb.run();
 
         } catch (Exception e) {

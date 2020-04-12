@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import LocalServer.LocalServer;
 import org.omg.CORBA.*;
@@ -29,6 +30,15 @@ class MonitoringStationImpl extends MonitoringStationPOA {
         return "Home";
     }
 
+    @Override
+    public boolean status() {
+        return false;
+    }
+
+    @Override
+    public void status(boolean arg) {
+        return;
+    }
 
     @Override
     public NoxReading get_reading() {
@@ -42,18 +52,13 @@ class MonitoringStationImpl extends MonitoringStationPOA {
     }
 
     @Override
-    public void registerWithLocalServer(String station_name, String station_location, String station_ior) {
-
-    }
-
-    @Override
     public void activate() {
 
     }
 
     @Override
     public void deactivate() {
-
+        this.status(false);
     }
 
     @Override
@@ -77,10 +82,10 @@ public class MonitoringStation {
             rootpoa.the_POAManager().activate();
 
             // create servant and register it with the ORB
-            MonitoringStationImpl sensorImpl = new MonitoringStationImpl();
+            MonitoringStationImpl monitoringStation = new MonitoringStationImpl();
 
             // Get the 'stringified IOR'
-            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(sensorImpl);
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(monitoringStation);
             String stringified_ior = orb.object_to_string(ref);
 
             // Save IOR to file
@@ -103,8 +108,9 @@ public class MonitoringStation {
                 CAQ.RegionalCentre server =
                         CAQ.RegionalCentreHelper.narrow(server_ref);
 
-                // call the Hello server object and print results
-                server.add_monitoring_station(sensorImpl.station_name(), sensorImpl.location(), stringified_ior);
+                server.add_monitoring_station(monitoringStation.station_name(), monitoringStation.location(), stringified_ior);
+
+                monitoringStation.activate();
 
                 System.out.println("Registered with Regional Center");
 
@@ -117,6 +123,7 @@ public class MonitoringStation {
             System.out.println("Monitoring Station ready and waiting ...");
 
             //activate with local server
+
             // wait for invocations from clients
             orb.run();
         }

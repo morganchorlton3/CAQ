@@ -1,25 +1,47 @@
 module CAQ {
 
     struct NoxReading {
-            long long time;
-            long long date;
-            string station_name;
-            long reading_value;
-        };
+        long long time;
+        long long date;
+        string station_name;
+        long reading_value;
+    };
+    struct Station {
+        string station_name;
+        string station_location;
+        string station_ior;
+    };
+
+
+    //Monitoring Station
 
     interface MonitoringStation {
          readonly attribute string station_name;
          readonly attribute string location;
+         attribute boolean status;
          NoxReading get_reading();
-         void registerWithLocalServer(in string station_name, in string station_location, in string station_ior);
          void activate();
          void deactivate();
          void reset();
      } ;
 
+    //Local Server
+    typedef sequence<NoxReading> Log_of_alarm_readings;
+    typedef sequence<NoxReading> Set_of_Readings;
+    typedef sequence<Station> station_list;
+
     interface RegionalCentre {
         readonly attribute string name;
         readonly attribute string location_name;
+        station_list getStationList();
+        void addStation(in Station station_object);
         void add_monitoring_station(in string station_name, in string station_location, in string station_ior);
+    };
+
+    //Monitoring Center
+    interface MonitoringCenter {
+        void raise_alarm(in NoxReading alarm_reading);
+        void register_agency(in string who, in string contact_details, in string area_of_interest);
+        void register_local_server(in string server_name);
     };
 };

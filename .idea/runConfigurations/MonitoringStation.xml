@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="testClient" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="testClient" />
+  <configuration default="false" name="MonitoringStation" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="MonitoringStation.MonitoringStation" />
     <module name="CAQ" />
     <option name="VM_PARAMETERS" value="-Djacorb.log.default.verbosity=2" />
     <method v="2">

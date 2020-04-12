@@ -1,8 +1,14 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="MonitoringCenter" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="MonitoringCenter" />
+    <option name="MAIN_CLASS_NAME" value="MonitoringCenter.MonitoringCenter" />
     <module name="CAQ" />
-    <option name="VM_PARAMETERS" value="--module-path /usr/share/openjfx/lib --add-modules=javafx.controls,javafx.fxml" />
+    <option name="VM_PARAMETERS" value="-Djacorb.log.default.verbosity=2 --module-path /usr/share/openjfx/lib --add-modules=javafx.controls,javafx.fxml" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="MonitoringCenter.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
