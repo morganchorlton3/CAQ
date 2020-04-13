@@ -33,6 +33,11 @@ public class MonitoringCenter extends Application {
         }
 
         @Override
+        public void station_name(String arg) {
+
+        }
+
+        @Override
         public String location() {
             return null;
         }

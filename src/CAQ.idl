@@ -16,7 +16,7 @@ module CAQ {
     //Monitoring Station
 
     interface MonitoringStation {
-         readonly attribute string station_name;
+         attribute string station_name;
          readonly attribute string location;
          attribute boolean status;
          NoxReading get_reading();
@@ -28,13 +28,11 @@ module CAQ {
     //Local Server
     typedef sequence<NoxReading> Log_of_alarm_readings;
     typedef sequence<NoxReading> Set_of_Readings;
-    typedef sequence<Station> station_list;
 
     interface RegionalCentre {
+        typedef sequence<Station> station_list;
         readonly attribute string name;
         readonly attribute string location_name;
-        station_list getStationList();
-        void addStation(in Station station_object);
         void add_monitoring_station(in string station_name, in string station_location, in string station_ior);
     };
 

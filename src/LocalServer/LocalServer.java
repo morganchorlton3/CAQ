@@ -16,7 +16,7 @@ class MonitoringStationServant extends RegionalCentrePOA {
     private ORB orb;
     private CAQ.MonitoringStation server;
 
-    public Station[] station_list;
+    List<Station> stationList = new ArrayList<>();
 
     @Override
     public String name() {
@@ -26,16 +26,6 @@ class MonitoringStationServant extends RegionalCentrePOA {
     @Override
     public String location_name() {
         return null;
-    }
-
-    @Override
-    public Station[] getStationList() {
-        return station_list;
-    }
-
-    @Override
-    public void addStation(Station station_object) {
-        station_list.
     }
 
     MonitoringStationServant(ORB orb_val) {
@@ -62,9 +52,8 @@ class MonitoringStationServant extends RegionalCentrePOA {
     public void add_monitoring_station(String station_name, String station_location, String station_ior) {
         CAQ.Station station = new CAQ.Station(station_name, station_location,station_ior);
         try{
-            //add(station);
-            //Testing
-            //System.out.println(stationsList.get(0).toString());
+            stationList.add(station);
+            System.out.println(stationList.toString());
         }catch (Exception e){
             e.printStackTrace();
         }

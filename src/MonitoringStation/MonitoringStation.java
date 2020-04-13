@@ -19,10 +19,16 @@ import org.omg.PortableServer.POA;
 
 class MonitoringStationImpl extends MonitoringStationPOA {
 
+    String station_name = "";
 
     @Override
     public String station_name() {
-        return "Station 1";
+        return station_name;
+    }
+
+    @Override
+    public void station_name(String name) {
+        station_name = name;
     }
 
     @Override
@@ -89,7 +95,7 @@ public class MonitoringStation {
             String stringified_ior = orb.object_to_string(ref);
 
             // Save IOR to file
-            BufferedWriter out = new BufferedWriter(new FileWriter("server.ref"));
+            BufferedWriter out = new BufferedWriter(new FileWriter("MonitoringStation.ref"));
             out.write(stringified_ior);
             out.close();
             System.out.println("stringified_ior = " + stringified_ior);
@@ -108,9 +114,11 @@ public class MonitoringStation {
                 CAQ.RegionalCentre server =
                         CAQ.RegionalCentreHelper.narrow(server_ref);
 
-                server.add_monitoring_station(monitoringStation.station_name(), monitoringStation.location(), stringified_ior);
+                monitoringStation.station_name("Hello World");
 
-                monitoringStation.activate();
+                System.out.println(monitoringStation.station_name);
+
+                server.add_monitoring_station(monitoringStation.station_name(), monitoringStation.location(), stringified_ior);
 
                 System.out.println("Registered with Regional Center");
 
