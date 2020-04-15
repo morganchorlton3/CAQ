@@ -8,6 +8,8 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 class RegionalCenterImpl extends RegionalCentrePOA {
@@ -15,6 +17,8 @@ class RegionalCenterImpl extends RegionalCentrePOA {
     public String stationName = "";
 
     public String stationLocation = "";
+
+    public List<Station> stationList = new ArrayList();
 
     @Override
     public String name() {
@@ -40,9 +44,13 @@ class RegionalCenterImpl extends RegionalCentrePOA {
     }
 
     @Override
-    public void add_monitoring_station(String station_name, String station_location, String station_ior) {
-
+    public void add_monitoring_station(String station_name, String station_location) {
+        System.out.println("Adding To List");
+        Station station = new Station(station_name, station_location);
+        stationList.add(station);
+        System.out.println(stationList.toString());
     }
+
 }
 
 public class LocalServer {

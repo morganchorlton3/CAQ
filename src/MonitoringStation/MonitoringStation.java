@@ -131,6 +131,8 @@ public class MonitoringStation {
                             "Location: " + monitoringStation.location() + '\n'
             );
 
+            registerWithRegionalCenter(orb, monitoringStation.name(), monitoringStation.location());
+
             //  wait for invocations from clients
             orb.run();
 
@@ -139,7 +141,7 @@ public class MonitoringStation {
             e.printStackTrace();
         }
     }
-    //Setup Regional Center
+    //Setup Monitoring Station
     private static MonitoringStationImpl setUpMonitoringStation(){
         // Create the Count servant object
         MonitoringStationImpl regionalCenter = new MonitoringStationImpl();
@@ -160,5 +162,49 @@ public class MonitoringStation {
         regionalCenter.location(stationLocation);
 
         return regionalCenter;
+    }
+
+    //Setup Register With Regional Center
+    private static void registerWithRegionalCenter(ORB orb,String stationName, String stationLocation){
+        System.out.println("Registering with Regional Center");
+        try {
+            // Get a reference to the Naming service
+            org.omg.CORBA.Object nameServiceObj =
+                    orb.resolve_initial_references ("NameService");
+            if (nameServiceObj == null) {
+                System.out.println("nameServiceObj = null");
+                return;
+            }
+
+            // Use NamingContextExt instead of NamingContext. This is
+            // part of the Interoperable naming Service.
+            NamingContextExt nameService = NamingContextExtHelper.narrow(nameServiceObj);
+            if (nameService == null) {
+                System.out.println("nameService = null");
+                return;
+            }
+
+            // resolve the Count object reference in the Naming service
+            Scanner in = new Scanner(System.in);
+
+            System.out.println("Name of the local server you want to register with:");
+
+            String regionalCenterName = in.nextLine();
+
+            try {
+                RegionalCentre regionalCentre = RegionalCentreHelper.narrow(nameService.resolve_str(regionalCenterName));
+                regionalCentre.add_monitoring_station(stationName,stationLocation);
+            }catch (Exception e){
+                System.out.println("Local server not found");
+            }
+
+
+            System.out.println("Monitoring Station registered with the local server");
+
+        } catch(Exception e) {
+            System.err.println("Exception");
+            System.err.println(e);
+        }
+
     }
 }

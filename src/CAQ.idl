@@ -9,7 +9,6 @@ module CAQ {
     struct Station {
         string name;
         string location;
-        string ior;
     };
 
 
@@ -36,7 +35,7 @@ module CAQ {
         attribute string name;
         attribute string location;
         readonly attribute Log_of_alarm_readings log;
-        void add_monitoring_station(in string station_name, in string station_location, in string station_ior);
+        void add_monitoring_station(in string station_name, in string station_location);
     };
 
     //Monitoring Center
