@@ -1,6 +1,7 @@
 package MonitoringCenter;
 
 import CAQ.NoxReading;
+import CAQ.Station;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MonitoringCenter extends Application {
 
@@ -25,51 +28,22 @@ public class MonitoringCenter extends Application {
         primaryStage.show();
     }
 
-    static class MonitoringCenterImpl extends CAQ.MonitoringStationPOA{
+    static class MonitoringCenterImpl extends CAQ.MonitoringCenterPOA {
+
+        List<Station> localStations = new ArrayList<>();
 
         @Override
-        public String station_name() {
-            return null;
-        }
-
-        @Override
-        public void station_name(String arg) {
-
-        }
-
-        @Override
-        public String location() {
-            return null;
-        }
-
-        @Override
-        public boolean status() {
-            return false;
-        }
-
-        @Override
-        public void status(boolean arg) {
+        public void raise_alarm(NoxReading alarm_reading) {
 
         }
 
         @Override
-        public NoxReading get_reading() {
-            return null;
-        }
-
-        @Override
-        public void activate() {
+        public void register_agency(String who, String contact_details, String area_of_interest) {
 
         }
 
         @Override
-        public void deactivate() {
-
-        }
-
-        @Override
-        public void reset() {
-
+        public void register_local_server(String server_name) {
         }
     }
 
@@ -90,7 +64,7 @@ public class MonitoringCenter extends Application {
             String stringified_ior = orb.object_to_string(ref);
 
             // Save IOR to file
-            BufferedWriter out = new BufferedWriter(new FileWriter("MonitoringCenter.ref"));
+            BufferedWriter out = new BufferedWriter(new FileWriter("/home/morgan/src/jacorb-3.9/bin/name.ior"));
             out.write(stringified_ior);
             out.close();
             System.out.println("stringified_ior = " + stringified_ior);

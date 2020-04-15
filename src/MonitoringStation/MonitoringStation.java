@@ -1,7 +1,6 @@
 package MonitoringStation;
 
-import CAQ.MonitoringStationPOA;
-import CAQ.NoxReading;
+import CAQ.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import LocalServer.LocalServer;
 import org.omg.CORBA.*;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
@@ -72,7 +73,6 @@ class MonitoringStationImpl extends MonitoringStationPOA {
 
     }
 
-
 }
 
 
@@ -95,16 +95,21 @@ public class MonitoringStation {
             String stringified_ior = orb.object_to_string(ref);
 
             // Save IOR to file
-            BufferedWriter out = new BufferedWriter(new FileWriter("MonitoringStation.ref"));
+            BufferedWriter out = new BufferedWriter(new FileWriter("name.ior"));
             out.write(stringified_ior);
             out.close();
             System.out.println("stringified_ior = " + stringified_ior);
 
-            System.out.println("Register with Local Sever");
+            System.out.println(stringified_ior);
 
+            //registerWithLocalServer(orb, monitoringStation, stringified_ior);
+
+            System.out.println("Monitoring Station ready and waiting ...");
+
+            //activate with local server
             try {
                 // read in the 'stringified IOR'
-                BufferedReader in = new BufferedReader(new FileReader("LocalServer.ref"));
+                BufferedReader in = new BufferedReader(new FileReader("name.ior"));
                 String LocalServer_stringified_ior = in.readLine();
                 System.out.println("stringified_ior = " + stringified_ior);
 
@@ -127,10 +132,6 @@ public class MonitoringStation {
                 e.printStackTrace(System.out);
             }
 
-
-            System.out.println("Monitoring Station ready and waiting ...");
-
-            //activate with local server
 
             // wait for invocations from clients
             orb.run();

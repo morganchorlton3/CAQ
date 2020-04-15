@@ -1,102 +1,125 @@
 package LocalServer;
 
-import java.io.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-
-import CAQ.RegionalCentrePOA;
-import CAQ.Station;
+import CAQ.*;
 import org.omg.CORBA.*;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
-class MonitoringStationServant extends RegionalCentrePOA {
+import java.util.Scanner;
 
-    private ORB orb;
-    private CAQ.MonitoringStation server;
+class RegionalCenterImpl extends RegionalCentrePOA {
 
-    List<Station> stationList = new ArrayList<>();
+    public String stationName = "";
+
+    public String stationLocation = "";
 
     @Override
     public String name() {
-        return null;
+        return stationName;
+    }
+
+    public void name(String name){
+        stationName = name;
     }
 
     @Override
-    public String location_name() {
-        return null;
+    public String location() {
+        return stationLocation;
     }
 
-    MonitoringStationServant(ORB orb_val) {
-        // store reference to ORB
-        orb = orb_val;
+    public void location(String location){
+        stationLocation = location;
+    }
 
-        // look up the server
-        try {
-            // read in the 'stringified IOR'
-            BufferedReader in = new BufferedReader(new FileReader("server.ref"));
-            String stringified_ior = in.readLine();
-
-            // get object reference from stringified IOR
-            org.omg.CORBA.Object server_ref =
-                    orb.string_to_object(stringified_ior);
-            server = CAQ.MonitoringStationHelper.narrow(server_ref);
-        } catch (Exception e) {
-            System.out.println("ERROR : " + e) ;
-            e.printStackTrace(System.out);
-        }
+    @Override
+    public NoxReading[] log() {
+        return new NoxReading[0];
     }
 
     @Override
     public void add_monitoring_station(String station_name, String station_location, String station_ior) {
-        CAQ.Station station = new CAQ.Station(station_name, station_location,station_ior);
-        try{
-            stationList.add(station);
-            System.out.println(stationList.toString());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
     }
 }
-
 
 public class LocalServer {
 
     public static void main(String[] args) {
         try {
-            // create and initialize the ORB
+            // Initialize the ORB
             ORB orb = ORB.init(args, null);
 
             // get reference to rootpoa & activate the POAManager
             POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
             rootpoa.the_POAManager().activate();
 
-            // create servant and register it with the ORB
-            MonitoringStationServant relayRef = new MonitoringStationServant(orb);
+            //Regional Center Setup
+            RegionalCenterImpl regionalCenter = registerRegionalCenter();
 
-            // Get the 'stringified IOR'
-            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(relayRef);
-            String stringified_ior = orb.object_to_string(ref);
+            // get object reference from the servant
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(regionalCenter);
+            RegionalCentre cref = RegionalCentreHelper.narrow(ref);
 
-            // Save IOR to file
-            BufferedWriter out = new BufferedWriter(new FileWriter("LocalServer.ref"));
-            out.write(stringified_ior);
-            out.close();
+            // Get a reference to the Naming service
+            org.omg.CORBA.Object nameServiceObj =
+                    orb.resolve_initial_references ("NameService");
+            if (nameServiceObj == null) {
+                System.out.println("nameServiceObj = null");
+                return;
+            }
 
-            // wait for invocations from clients
-            System.out.println("Local Server started.  Waiting for clients...");
+            // Use NamingContextExt which is part of the Interoperable
+            // Naming Service (INS) specification.
+            NamingContextExt nameService = NamingContextExtHelper.narrow(nameServiceObj);
+            if (nameService == null) {
+                System.out.println("nameService = null");
+                return;
+            }
+
+            // bind the Count object in the Naming service
 
 
+            NameComponent[] countName = nameService.to_name(regionalCenter.name());
+            nameService.rebind(countName, cref);
 
+            System.out.println("Local Server Ready...");
+
+            System.out.println(
+                    "Name: " + regionalCenter.name() + '\n' +
+                            "Location: " + regionalCenter.location() + '\n'
+            );
+
+            //  wait for invocations from clients
             orb.run();
 
-        } catch (Exception e) {
-            System.err.println("ERROR: " + e);
-            e.printStackTrace(System.out);
+
+        } catch(Exception e) {
+            e.printStackTrace();
         }
+    }
+    //Setup Regional Center
+    private static RegionalCenterImpl registerRegionalCenter(){
+        // Create the Count servant object
+        RegionalCenterImpl regionalCenter = new RegionalCenterImpl();
+        System.out.println("Setting up Local Server");
 
-        System.out.println("Local Server Exiting ...");
+        Scanner in = new Scanner(System.in);
 
+        System.out.println("Station Name:");
+
+        String stationName = in.nextLine();
+
+        regionalCenter.name(stationName);
+
+        System.out.println("Station Location:");
+
+        String stationLocation = in.nextLine();
+
+        regionalCenter.location(stationLocation);
+
+        return regionalCenter;
     }
 }
