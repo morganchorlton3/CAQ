@@ -5,7 +5,16 @@
 
 Setup And Running:
 
-For Step 1. and 2.
+Add Jacorb 
+
+    Jacorb Download:
+
+    https://drive.google.com/file/d/1fjcKhrBw5iqWjZDuAKC25L7qjHUIZxrc/view?usp=sharing
+
+    Also download the library jboss-rmi-api_1.0_spec-1.0.6.Final.jar from the Maven Repository at:
+    
+    https://mvnrepository.com/artifact/org.jboss.spec.javax.rmi/jboss-rmi-api_1.0_spec/1.0.6.Final.
+ 
 
 How to add libraries:
 
@@ -28,10 +37,16 @@ To run the Monitoring station (GUI) you may need to add this VM argument
 
     --module-path Path to openFX/ JFX --add-modules=javafx.controls,javafx.fxml
 
+Add to program arguments:
+
+    -ORBInitRef.NameService=file: Path to ior file
+
+    -ORBInitRef.NameService=file:/home/morgan/Work/University/Distributed/name.ior
+
 Start Naming Service:
 
     (you may need to add jacrob to path)
 
-    ns -Djacorb.naming.ior_filename= $path to ior file
+    ns -Djacorb.naming.ior_filename= Path to ior file
     
     ns -Djacorb.naming.ior_filename=/home/morgan/Work/University/Distributed/name.ior

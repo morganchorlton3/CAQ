@@ -8,10 +8,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Date;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import LocalServer.LocalServer;
 import org.omg.CORBA.*;
+import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.*;
@@ -20,21 +22,27 @@ import org.omg.PortableServer.POA;
 
 class MonitoringStationImpl extends MonitoringStationPOA {
 
-    String station_name = "";
+    String name = "";
+    String location  = "";
 
     @Override
-    public String station_name() {
-        return station_name;
+    public String name() {
+        return name;
     }
 
     @Override
-    public void station_name(String name) {
-        station_name = name;
+    public void name(String stationName) {
+        name = stationName;
     }
 
     @Override
     public String location() {
-        return "Home";
+        return location;
+    }
+
+    @Override
+    public void location(String stationLocation) {
+        location = stationLocation;
     }
 
     @Override
@@ -55,7 +63,7 @@ class MonitoringStationImpl extends MonitoringStationPOA {
 
         //Random Number
         int co2 = r.nextInt(100-10) + 10;
-        return new NoxReading(date.getTime(), date.getTime(),station_name(),co2);
+        return new NoxReading(date.getTime(), date.getTime(), name(),co2);
     }
 
     @Override
@@ -80,69 +88,77 @@ public class MonitoringStation {
 
     public static void main(String[] args) {
         try {
-            // create and initialize the ORB
+            // Initialize the ORB
             ORB orb = ORB.init(args, null);
 
             // get reference to rootpoa & activate the POAManager
             POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
             rootpoa.the_POAManager().activate();
 
-            // create servant and register it with the ORB
-            MonitoringStationImpl monitoringStation = new MonitoringStationImpl();
+            //Regional Center Setup
+            MonitoringStationImpl monitoringStation = setUpMonitoringStation();
 
-            // Get the 'stringified IOR'
+            // get object reference from the servant
             org.omg.CORBA.Object ref = rootpoa.servant_to_reference(monitoringStation);
-            String stringified_ior = orb.object_to_string(ref);
+            CAQ.MonitoringStation MSRef = MonitoringStationHelper.narrow(ref);
 
-            // Save IOR to file
-            BufferedWriter out = new BufferedWriter(new FileWriter("name.ior"));
-            out.write(stringified_ior);
-            out.close();
-            System.out.println("stringified_ior = " + stringified_ior);
-
-            System.out.println(stringified_ior);
-
-            //registerWithLocalServer(orb, monitoringStation, stringified_ior);
-
-            System.out.println("Monitoring Station ready and waiting ...");
-
-            //activate with local server
-            try {
-                // read in the 'stringified IOR'
-                BufferedReader in = new BufferedReader(new FileReader("name.ior"));
-                String LocalServer_stringified_ior = in.readLine();
-                System.out.println("stringified_ior = " + stringified_ior);
-
-                // get object reference from stringified IOR
-                org.omg.CORBA.Object server_ref =
-                        orb.string_to_object(LocalServer_stringified_ior);
-                CAQ.RegionalCentre server =
-                        CAQ.RegionalCentreHelper.narrow(server_ref);
-
-                monitoringStation.station_name("Hello World");
-
-                System.out.println(monitoringStation.station_name);
-
-                server.add_monitoring_station(monitoringStation.station_name(), monitoringStation.location(), stringified_ior);
-
-                System.out.println("Registered with Regional Center");
-
-            } catch (Exception e) {
-                System.out.println("ERROR : " + e) ;
-                e.printStackTrace(System.out);
+            // Get a reference to the Naming service
+            org.omg.CORBA.Object nameServiceObj =
+                    orb.resolve_initial_references ("NameService");
+            if (nameServiceObj == null) {
+                System.out.println("nameServiceObj = null");
+                return;
             }
 
+            // Use NamingContextExt which is part of the Interoperable
+            // Naming Service (INS) specification.
+            NamingContextExt nameService = NamingContextExtHelper.narrow(nameServiceObj);
+            if (nameService == null) {
+                System.out.println("nameService = null");
+                return;
+            }
 
-            // wait for invocations from clients
+            // bind the Count object in the Naming service
+
+
+            NameComponent[] countName = nameService.to_name(monitoringStation.name());
+            nameService.rebind(countName, MSRef);
+
+            System.out.println("Monitoring Station Ready...");
+
+            System.out.println(
+                    "Name: " + monitoringStation.name() + '\n' +
+                            "Location: " + monitoringStation.location() + '\n'
+            );
+
+            //  wait for invocations from clients
             orb.run();
+
+
+        } catch(Exception e) {
+            e.printStackTrace();
         }
+    }
+    //Setup Regional Center
+    private static MonitoringStationImpl setUpMonitoringStation(){
+        // Create the Count servant object
+        MonitoringStationImpl regionalCenter = new MonitoringStationImpl();
+        System.out.println("Setting up Local Server");
 
-        catch (Exception e) {
-            System.err.println("ERROR: " + e);
-            e.printStackTrace(System.out);
-        }
+        Scanner in = new Scanner(System.in);
 
-        System.out.println("HelloServer Exiting ...");
+        System.out.println("Station Name:");
 
+        String stationName = in.nextLine();
+
+        regionalCenter.name(stationName);
+
+        System.out.println("Station Location:");
+
+        String stationLocation = in.nextLine();
+
+        regionalCenter.location(stationLocation);
+
+        return regionalCenter;
     }
 }

@@ -108,13 +108,13 @@ public class LocalServer {
 
         Scanner in = new Scanner(System.in);
 
-        System.out.println("Station Name:");
+        System.out.println("Local Server Name:");
 
         String stationName = in.nextLine();
 
         regionalCenter.name(stationName);
 
-        System.out.println("Station Location:");
+        System.out.println("Local Server Location:");
 
         String stationLocation = in.nextLine();
 

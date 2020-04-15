@@ -7,17 +7,17 @@ module CAQ {
         long reading_value;
     };
     struct Station {
-        string station_name;
-        string station_location;
-        string station_ior;
+        string name;
+        string location;
+        string ior;
     };
 
 
     //Monitoring Station
 
     interface MonitoringStation {
-         attribute string station_name;
-         readonly attribute string location;
+         attribute string name;
+         attribute string location;
          attribute boolean status;
          NoxReading get_reading();
          void activate();
