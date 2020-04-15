@@ -27,3 +27,11 @@ Generate IDL code
 To run the Monitoring station (GUI) you may need to add this VM argument
 
     --module-path Path to openFX/ JFX --add-modules=javafx.controls,javafx.fxml
+
+Start Naming Service:
+
+    (you may need to add jacrob to path)
+
+    ns -Djacorb.naming.ior_filename= $path to ior file
+    
+    ns -Djacorb.naming.ior_filename=/home/morgan/Work/University/Distributed/name.ior
