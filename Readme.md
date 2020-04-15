@@ -13,7 +13,7 @@ Add Jacorb
 
     Also download the library jboss-rmi-api_1.0_spec-1.0.6.Final.jar from the Maven Repository at:
     
-    https://mvnrepository.com/artifact/org.jboss.spec.javax.rmi/jboss-rmi-api_1.0_spec/1.0.6.Final.
+    https://mvnrepository.com/artifact/org.jboss.spec.javax.rmi/jboss-rmi-api_1.0_spec/1.0.6.Final
  
 
 How to add libraries:

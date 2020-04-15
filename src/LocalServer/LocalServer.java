@@ -93,6 +93,10 @@ public class LocalServer {
             NameComponent[] countName = nameService.to_name(regionalCenter.name());
             nameService.rebind(countName, cref);
 
+            System.out.println("Registering with the Monitoring Center");
+
+            registerWithRegionalCenter(orb,regionalCenter.name());
+
             System.out.println("Local Server Ready...");
 
             System.out.println(
@@ -129,5 +133,42 @@ public class LocalServer {
         regionalCenter.location(stationLocation);
 
         return regionalCenter;
+    }
+
+    //Setup Register With Monitoring Center
+    private static void registerWithRegionalCenter(ORB orb,String serverName){
+        System.out.println("Registering with Monitoring Center");
+        try {
+            // Get a reference to the Naming service
+            org.omg.CORBA.Object nameServiceObj =
+                    orb.resolve_initial_references ("NameService");
+            if (nameServiceObj == null) {
+                System.out.println("nameServiceObj = null");
+                return;
+            }
+
+            // Use NamingContextExt instead of NamingContext. This is
+            // part of the Interoperable naming Service.
+            NamingContextExt nameService = NamingContextExtHelper.narrow(nameServiceObj);
+            if (nameService == null) {
+                System.out.println("nameService = null");
+                return;
+            }
+
+            try {
+                MonitoringCenter monitoringCenter = MonitoringCenterHelper.narrow(nameService.resolve_str("MonitoringCenter"));
+                monitoringCenter.register_local_server(serverName);
+            }catch (Exception e){
+                System.out.println("Monitoring Center not found");
+            }
+
+
+            System.out.println("Local Server registered with the Monitoring Center");
+
+        } catch(Exception e) {
+            System.err.println("Exception");
+            System.err.println(e);
+        }
+
     }
 }

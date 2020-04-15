@@ -20,7 +20,10 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+
 class MonitoringCenterImpl extends MonitoringCenterPOA {
+
+    static List<String> localServerList = new ArrayList<>();
 
     @Override
     public void raise_alarm(NoxReading alarm_reading) {
@@ -34,7 +37,13 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
 
     @Override
     public void register_local_server(String server_name) {
+        localServerList.add(server_name);
+        System.out.println(server_name + " has successfully been registered");
+    }
 
+
+    public static List<String> getLocalServerList(){
+        return localServerList;
     }
 }
 
@@ -60,10 +69,10 @@ public class MonitoringCenter extends Application {
             rootpoa.the_POAManager().activate();
 
             // Create the Count servant object
-            MonitoringCenterImpl MCservant = new MonitoringCenterImpl();
+            MonitoringCenterImpl MCServant = new MonitoringCenterImpl();
 
             // get object reference from the servant
-            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(MCservant);
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(MCServant);
             CAQ.MonitoringCenter MSRef = MonitoringCenterHelper.narrow(ref);
 
             // Get a reference to the Naming service
@@ -82,20 +91,56 @@ public class MonitoringCenter extends Application {
                 return;
             }
 
-            // bind the Count object in the Naming service
-            String name = "countName";
-            NameComponent[] countName = nameService.to_name(name);
-            nameService.rebind(countName, MSRef);
+            NameComponent[] monitoringCenters = nameService.to_name("MonitoringCenter");
+            nameService.rebind(monitoringCenters, MSRef);
 
-            //  wait for invocations from clients
+            //Launch GUI
             launch(args);
 
+            //  wait for invocations from clients
             orb.run();
 
 
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+    public static void getReading(String[] args, String serverName){
+        try {
+
+            ORB orb = ORB.init(args, null);
+            // Get a reference to the Naming service
+            org.omg.CORBA.Object nameServiceObj =
+                    orb.resolve_initial_references ("NameService");
+            if (nameServiceObj == null) {
+                System.out.println("nameServiceObj = null");
+                return;
+            }
+
+            // Use NamingContextExt instead of NamingContext. This is
+            // part of the Interoperable naming Service.
+            NamingContextExt nameService = NamingContextExtHelper.narrow(nameServiceObj);
+            if (nameService == null) {
+                System.out.println("nameService = null");
+                return;
+            }
+
+            try {
+                MonitoringStation monitoringCenter = MonitoringStationHelper.narrow(nameService.resolve_str("MS1"));
+                System.out.println(monitoringCenter.get_reading());
+
+            }catch (Exception e){
+                System.out.println("Monitoring Center not found");
+            }
+
+
+            System.out.println("Local Server registered with the Monitoring Center");
+
+        } catch(Exception e) {
+            System.err.println("Exception");
+            System.err.println(e);
+        }
+
     }
 
 }
