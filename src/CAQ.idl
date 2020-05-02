@@ -35,6 +35,7 @@ module CAQ {
         attribute string name;
         attribute string location;
         readonly attribute Log_of_alarm_readings log;
+        void takeReadings();
         void add_monitoring_station(in string station_name, in string station_location);
     };
 

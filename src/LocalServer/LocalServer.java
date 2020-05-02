@@ -1,10 +1,13 @@
 package LocalServer;
 
 import CAQ.*;
+import org.jacorb.tao_imr.ImplementationRepository.NotFound;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
+import org.omg.CosNaming.NamingContextPackage.InvalidName;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
@@ -12,7 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class RegionalCenterImpl extends RegionalCentrePOA {
+class RegionalCenterServant extends RegionalCentrePOA {
+
+    private ORB orb;
+    private NamingContextExt nameService;
 
     public String stationName = "";
 
@@ -44,11 +50,51 @@ class RegionalCenterImpl extends RegionalCentrePOA {
     }
 
     @Override
+    public void takeReadings(){
+        String centreName = stationList.get(0).name;
+        try {
+            MonitoringStation centreServant = MonitoringStationHelper.narrow(nameService.resolve_str(centreName));
+            NoxReading reading = centreServant.get_reading();
+            System.out.println(reading.station_name);
+        }catch (CannotProceed cannotProceed) {
+            cannotProceed.printStackTrace();
+        } catch (InvalidName invalidName) {
+            invalidName.printStackTrace();
+        } catch (org.omg.CosNaming.NamingContextPackage.NotFound notFound) {
+            notFound.printStackTrace();
+        }
+    }
+
+    @Override
     public void add_monitoring_station(String station_name, String station_location) {
         System.out.println("Adding To List");
         Station station = new Station(station_name, station_location);
         stationList.add(station);
         System.out.println(stationList.toString());
+    }
+
+    public RegionalCenterServant(ORB orb_val) {
+        try {
+            orb = orb_val;
+            // Get a reference to the Naming service
+            org.omg.CORBA.Object nameServiceObj = orb.resolve_initial_references ("NameService");
+            if (nameServiceObj == null) {
+                System.out.println("nameServiceObj = null");
+                return;
+            }
+
+            // Use NamingContextExt which is part of the Interoperable
+            // Naming Service (INS) specification.
+            nameService = NamingContextExtHelper.narrow(nameServiceObj);
+            if (nameService == null) {
+                System.out.println("nameService = null");
+                return;
+            }
+
+        } catch (Exception e) {
+            System.out.println("ERROR : " + e) ;
+            e.printStackTrace(System.out);
+        }
     }
 
 }
@@ -65,7 +111,7 @@ public class LocalServer {
             rootpoa.the_POAManager().activate();
 
             //Regional Center Setup
-            RegionalCenterImpl regionalCenter = registerRegionalCenter();
+            RegionalCenterServant regionalCenter = registerRegionalCenter(orb);
 
             // get object reference from the servant
             org.omg.CORBA.Object ref = rootpoa.servant_to_reference(regionalCenter);
@@ -93,9 +139,9 @@ public class LocalServer {
             NameComponent[] countName = nameService.to_name(regionalCenter.name());
             nameService.rebind(countName, cref);
 
-            System.out.println("Registering with the Monitoring Center");
+            //System.out.println("Registering with the Monitoring Center");
 
-            registerWithRegionalCenter(orb,regionalCenter.name());
+            //registerWithRegionalCenter(orb,regionalCenter.name());
 
             System.out.println("Local Server Ready...");
 
@@ -113,9 +159,9 @@ public class LocalServer {
         }
     }
     //Setup Regional Center
-    private static RegionalCenterImpl registerRegionalCenter(){
+    private static RegionalCenterServant registerRegionalCenter(ORB orb){
         // Create the Count servant object
-        RegionalCenterImpl regionalCenter = new RegionalCenterImpl();
+        RegionalCenterServant regionalCenter = new RegionalCenterServant(orb);
         System.out.println("Setting up Local Server");
 
         Scanner in = new Scanner(System.in);
