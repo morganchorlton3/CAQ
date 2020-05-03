@@ -11,22 +11,24 @@ module CAQ {
         string location;
     };
 
+    typedef sequence<NoxReading> Log_of_alarm_readings;
+    typedef sequence<NoxReading> Set_of_Readings;
 
     //Monitoring Station
 
     interface MonitoringStation {
-         attribute string name;
-         attribute string location;
-         attribute boolean status;
-         NoxReading get_reading();
-         void activate();
-         void deactivate();
-         void reset();
+        //typedef sequence<NoxReading> Set_of_Readings;
+        readonly attribute Set_of_Readings readingsLog;
+        attribute string name;
+        attribute string location;
+        attribute boolean status;
+        NoxReading get_reading();
+        void activate();
+        void deactivate();
+        void reset();
      } ;
 
     //Local Server
-    typedef sequence<NoxReading> Log_of_alarm_readings;
-    typedef sequence<NoxReading> Set_of_Readings;
 
     interface RegionalCentre {
         typedef sequence<Station> station_list;

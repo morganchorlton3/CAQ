@@ -12,6 +12,7 @@ import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -25,6 +26,8 @@ class RegionalCenterServant extends RegionalCentrePOA {
     public String stationLocation = "";
 
     public List<Station> stationList = new ArrayList();
+
+    public List<NoxReading> stationReadings = new ArrayList();
 
     @Override
     public String name() {
@@ -51,17 +54,26 @@ class RegionalCenterServant extends RegionalCentrePOA {
 
     @Override
     public void takeReadings(){
-        String centreName = stationList.get(0).name;
-        try {
-            MonitoringStation centreServant = MonitoringStationHelper.narrow(nameService.resolve_str(centreName));
-            NoxReading reading = centreServant.get_reading();
-            System.out.println(reading.station_name);
-        }catch (CannotProceed cannotProceed) {
-            cannotProceed.printStackTrace();
-        } catch (InvalidName invalidName) {
-            invalidName.printStackTrace();
-        } catch (org.omg.CosNaming.NamingContextPackage.NotFound notFound) {
-            notFound.printStackTrace();
+        for (int i = 0; i < stationList.size(); i++) {
+            String name = stationList.get(i).name;
+            System.out.println(name);
+            try {
+                MonitoringStation msServant = MonitoringStationHelper.narrow(nameService.resolve_str(name));
+                ArrayList<NoxReading> collectedReadings = new ArrayList<>(Arrays.asList(msServant.readingsLog()));
+                for (int j = 0; j < collectedReadings.size(); j++) {
+                    stationReadings.add(collectedReadings.get(j));
+                }
+                for (int k = 0; k < stationReadings.size(); k++) {
+                    System.out.println("Station Name: " + stationReadings.get(k).station_name + " Reading: " +
+                            stationReadings.get(k).reading_value);
+                }
+            } catch (CannotProceed cannotProceed) {
+                cannotProceed.printStackTrace();
+            } catch (InvalidName invalidName) {
+                invalidName.printStackTrace();
+            } catch (org.omg.CosNaming.NamingContextPackage.NotFound notFound) {
+                notFound.printStackTrace();
+            }
         }
     }
 
@@ -70,7 +82,9 @@ class RegionalCenterServant extends RegionalCentrePOA {
         System.out.println("Adding To List");
         Station station = new Station(station_name, station_location);
         stationList.add(station);
-        System.out.println(stationList.toString());
+        for (int i = 0; i < stationList.size(); i++) {
+            System.out.println(stationList.get(i).name);
+        }
     }
 
     public RegionalCenterServant(ORB orb_val) {

@@ -37,12 +37,10 @@ public class MonitoringCenterController implements Initializable {
     public void updateLocalServerList()
     {
         List<String> stationList = MonitoringCenterImpl.getLocalServerList();
-        ObservableList<String> seasonList = FXCollections.<String>observableArrayList();
-        seasonList.addAll(stationList);
-        System.out.println("LIST");
-        System.out.println(seasonList.toString());
+        ObservableList<String> SList = FXCollections.<String>observableArrayList();
+        SList.addAll(stationList);
         listView.getItems().clear();
-        listView.getItems().addAll(seasonList);
+        listView.getItems().addAll(SList);
     }
 
     @FXML

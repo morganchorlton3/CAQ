@@ -105,42 +105,6 @@ public class MonitoringCenter extends Application {
             e.printStackTrace();
         }
     }
-    public static void getReading(String[] args, String serverName){
-        try {
 
-            ORB orb = ORB.init(args, null);
-            // Get a reference to the Naming service
-            org.omg.CORBA.Object nameServiceObj =
-                    orb.resolve_initial_references ("NameService");
-            if (nameServiceObj == null) {
-                System.out.println("nameServiceObj = null");
-                return;
-            }
-
-            // Use NamingContextExt instead of NamingContext. This is
-            // part of the Interoperable naming Service.
-            NamingContextExt nameService = NamingContextExtHelper.narrow(nameServiceObj);
-            if (nameService == null) {
-                System.out.println("nameService = null");
-                return;
-            }
-
-            try {
-                MonitoringStation monitoringCenter = MonitoringStationHelper.narrow(nameService.resolve_str("MS1"));
-                System.out.println(monitoringCenter.get_reading());
-
-            }catch (Exception e){
-                System.out.println("Monitoring Center not found");
-            }
-
-
-            System.out.println("Local Server registered with the Monitoring Center");
-
-        } catch(Exception e) {
-            System.err.println("Exception");
-            System.err.println(e);
-        }
-
-    }
 
 }

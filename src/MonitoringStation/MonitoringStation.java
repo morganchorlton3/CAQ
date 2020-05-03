@@ -2,16 +2,8 @@ package MonitoringStation;
 
 import CAQ.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.Date;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
-import LocalServer.LocalServer;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
@@ -19,11 +11,22 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 class MonitoringStationImpl extends MonitoringStationPOA {
 
     String name = "";
     String location  = "";
+    Timer timer = new Timer( );
+    public List<NoxReading> readingsLog = new ArrayList();
+
+
+    @Override
+    public NoxReading[] readingsLog() {
+        return readingsLog.toArray(new NoxReading[0]);
+    }
 
     @Override
     public String name() {
@@ -68,18 +71,29 @@ class MonitoringStationImpl extends MonitoringStationPOA {
 
     @Override
     public void activate() {
-
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                NoxReading reading = get_reading();
+                if(reading.reading_value > 90){
+                    System.out.println("ALARM!!!!!!!!");
+                }
+                readingsLog.add(reading);
+                System.out.println(reading.reading_value);
+            }
+        }, 1000,5000);
     }
 
     @Override
     public void deactivate() {
-        this.status(false);
+        timer.cancel();
     }
 
     @Override
     public void reset() {
-
+        readingsLog.clear();
     }
+
 
 }
 
@@ -133,6 +147,7 @@ public class MonitoringStation {
 
             registerWithRegionalCenter(orb, monitoringStation.name(), monitoringStation.location());
 
+            monitoringStation.activate();
             //  wait for invocations from clients
             orb.run();
 
@@ -145,7 +160,7 @@ public class MonitoringStation {
     private static MonitoringStationImpl setUpMonitoringStation(){
         // Create the Count servant object
         MonitoringStationImpl regionalCenter = new MonitoringStationImpl();
-        System.out.println("Setting up Local Server");
+        System.out.println("Setting up Monitoring Station");
 
         Scanner in = new Scanner(System.in);
 
