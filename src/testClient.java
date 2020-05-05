@@ -33,11 +33,7 @@ public class testClient {
             // resolve the Count object reference in the Naming service
             String name = "MonitoringCenter";
             MonitoringCenter counter = MonitoringCenterHelper.narrow(nameService.resolve_str(name));
-            counter.takeReadings("LS1");
-            ArrayList<NoxReading> collectedReadings = new ArrayList<>(Arrays.asList(counter.readingsLog()));
-            for (int i = 0; i < collectedReadings.size(); i++) {
-                System.out.println(collectedReadings.get(i).reading_value);
-            }
+            counter.takeReadings("Ls1");
 
         } catch(Exception e) {
             System.err.println("Exception");

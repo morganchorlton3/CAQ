@@ -39,12 +39,33 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                      <children>
-                        <Button fx:id="updateBtn" mnemonicParsing="false" onAction="#updateBtn" text="Update">
+                        <Button fx:id="getReadingBtn" mnemonicParsing="false" onAction="#getReading" text="Get Reading">
                            <HBox.margin>
                               <Insets left="5.0" right="5.0" />
                            </HBox.margin>
                         </Button>
-                        <Button fx:id="getReadingBtn" mnemonicParsing="false" onAction="#getReading" text="Get Reading">
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Readings" fx:id="readingsTitle">
+                     <VBox.margin>
+                        <Insets bottom="15.0" top="15.0" />
+                     </VBox.margin>
+                  </Text>
+                  <ListView fx:id="readingsListView" prefHeight="200.0" prefWidth="200.0">
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" />
+                     </VBox.margin>
+                  </ListView>
+                  <HBox alignment="CENTER">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                     <children>
+                        <Button fx:id="getReadingBtn1" mnemonicParsing="false" onAction="#getReading" text="Get Reading" visible="false">
                            <HBox.margin>
                               <Insets left="5.0" right="5.0" />
                            </HBox.margin>

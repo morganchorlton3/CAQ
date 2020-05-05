@@ -28,13 +28,13 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     private NamingContextExt nameService;
 
     static List<String> localServerList = new ArrayList<>();
-    static List<NoxReading> lsLog = new ArrayList<>();
+    static List<NoxReading> readingsLog = new ArrayList<>();
 
     public MonitoringCenterImpl(ORB orb_val) {
         try {
             orb = orb_val;
             // Get a reference to the Naming service
-            org.omg.CORBA.Object nameServiceObj = orb.resolve_initial_references ("NameService");
+            org.omg.CORBA.Object nameServiceObj = orb.resolve_initial_references("NameService");
             if (nameServiceObj == null) {
                 System.out.println("nameServiceObj = null");
                 return;
@@ -49,7 +49,7 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
             }
 
         } catch (Exception e) {
-            System.out.println("ERROR : " + e) ;
+            System.out.println("ERROR : " + e);
             e.printStackTrace(System.out);
         }
     }
@@ -57,11 +57,6 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     @Override
     public void raise_alarm(NoxReading alarm_reading) {
 
-    }
-
-    @Override
-    public NoxReading[] readingsLog() {
-        return lsLog.toArray(new NoxReading[0]);
     }
 
     @Override
@@ -83,35 +78,33 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
             RegionalCentre lsServant = RegionalCentreHelper.narrow(nameService.resolve_str(name));
             ArrayList<NoxReading> collectedReadings = new ArrayList<>(Arrays.asList(lsServant.readingsLog()));
             for (int i = 0; i < collectedReadings.size(); i++) {
-               lsLog.add(collectedReadings.get(i));
+                readingsLog.add(collectedReadings.get(i));
             }
-            ObservableList<String> readings = FXCollections.observableArrayList ();
-            for (NoxReading reading : lsLog) {
-                String readingToAdd = "MS Name : " + reading.station_name + " Reading: " + reading.reading_value;
-                readings.addAll(readingToAdd);
-            }
-            Alerts.Alert("High Reading");
+            MonitoringCenterController.updateReadings();
         } catch (NotFound | CannotProceed | InvalidName notFound) {
             notFound.printStackTrace();
         }
     }
 
 
-    public static List<String> getLocalServerList(){
+    public static List<String> getLocalServerList() {
         return localServerList;
     }
 
-    public static List<NoxReading> getReadings(){
-        return lsLog;
+    public static List<NoxReading> getReadingsList() {
+        return readingsLog;
     }
+
 }
 
 public class MonitoringCenter extends Application {
 
+    public static ORB orb;
+
     static public void main(String[] args) {
         try {
             // Initialize the ORB
-            ORB orb = ORB.init(args, null);
+            orb = ORB.init(args, null);
 
             // get reference to rootpoa & activate the POAManager
             POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
@@ -153,6 +146,10 @@ public class MonitoringCenter extends Application {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static ORB getOrb(){
+        return orb;
     }
 
     //GUI
