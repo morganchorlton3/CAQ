@@ -3,7 +3,7 @@
     <option name="MAIN_CLASS_NAME" value="MonitoringCenter.MonitoringCenter" />
     <module name="CAQ" />
     <option name="PROGRAM_PARAMETERS" value="-ORBInitRef.NameService=file:$PROJECT_DIR$/../../name.ior" />
-    <option name="VM_PARAMETERS" value="-Djacorb.log.default.verbosity=2 -Djava.rmi.server.useCodebaseOnly=false --module-path /usr/share/openjfx/lib --add-modules=javafx.controls,javafx.fxml" />
+    <option name="VM_PARAMETERS" value="-Djacorb.log.default.verbosity=2 -Djava.rmi.server.useCodebaseOnly=false --module-path $USER_HOME$/src/javafx-sdk-11.0.2/lib --add-modules=javafx.controls,javafx.fxml" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="MonitoringCenter.*" />

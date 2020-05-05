@@ -163,7 +163,6 @@ public class MonitoringCenter extends Application {
         Scene scene = new Scene(root, 800, 500);
         primaryStage.setScene(scene);
         primaryStage.show();
-
     }
 
 }

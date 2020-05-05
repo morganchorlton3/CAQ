@@ -7,9 +7,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
@@ -32,7 +38,7 @@ public class MonitoringCenterController implements Initializable {
     @FXML
     private ListView<String> readingsListView;
     @FXML
-    private Button getReadingBtn;
+    private Button getReadingBtn, viewStationsBTN;
     @FXML
     private Text readingsTitle;
 
@@ -41,7 +47,7 @@ public class MonitoringCenterController implements Initializable {
     public void initialize(URL url, ResourceBundle rb){
         lsListView.setItems(lsList);
         readingsListView.setItems(readingsList);
-        getReadingBtn.disableProperty().bind(lsListView.getSelectionModel().selectedItemProperty().isNull());
+//        getReadingBtn.disableProperty().bind(lsListView.getSelectionModel().selectedItemProperty().isNull());
         //getReadingBtn.disableProperty().bind(readingsListView.getSelectionModel().selectedItemProperty().isNull());
     }
 
@@ -100,12 +106,28 @@ public class MonitoringCenterController implements Initializable {
         updateReadings();
     }
 
+    @FXML
+    private void ViewStations(ActionEvent event) throws IOException {
+        String lsName = lsListView.getSelectionModel().getSelectedItem();
+        StationsController.setLSName(lsName);
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/MonitoringCenter/Stations.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("Monitoring Stations");
+            stage.setScene(new Scene(root, 450, 450));
+            stage.show();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void raiseAlarm(NoxReading reading){
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("High Reading");
 
-            String  toAdd =  "MS: " + reading.station_name + " has received a high reading of: " + reading.reading_value;
+            String  toAdd =  reading.station_name + " has received a high reading of: " + reading.reading_value;
 
             // Header Text: null
             alert.setHeaderText(null);

@@ -34,6 +34,7 @@ module CAQ {
         typedef sequence<Station> station_list;
         typedef sequence<NoxReading> Log_of_alarm_readings;
         readonly attribute Set_of_Readings readingsLog;
+        readonly attribute station_list stations;
         attribute string name;
         attribute string location;
         void takeReadings();

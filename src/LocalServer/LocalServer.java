@@ -38,6 +38,11 @@ class RegionalCenterServant extends RegionalCentrePOA {
     }
 
     @Override
+    public Station[] stations() {
+        return stationList.toArray(new Station[0]);
+    }
+
+    @Override
     public String name() {
         return stationName;
     }
