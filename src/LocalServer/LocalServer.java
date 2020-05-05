@@ -80,6 +80,11 @@ class RegionalCenterServant extends RegionalCentrePOA {
     }
 
     @Override
+    public void raise_alarm(NoxReading reading) {
+        System.out.println("ALARM RECIVED");
+    }
+
+    @Override
     public void add_monitoring_station(String station_name, String station_location) {
         System.out.println("Adding To List");
         Station station = new Station(station_name, station_location);
@@ -155,9 +160,9 @@ public class LocalServer {
             NameComponent[] countName = nameService.to_name(regionalCenter.name());
             nameService.rebind(countName, cref);
 
-            System.out.println("Registering with the Monitoring Center");
+            //System.out.println("Registering with the Monitoring Center");
 
-            registerWithRegionalCenter(orb,regionalCenter.name());
+            //registerWithRegionalCenter(orb,regionalCenter.name());
 
             System.out.println("Local Server Ready...");
 

@@ -8,6 +8,9 @@ import org.omg.CORBA.*;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
+import org.omg.CosNaming.NamingContextPackage.InvalidName;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
@@ -21,6 +24,9 @@ class MonitoringStationImpl extends MonitoringStationPOA {
     String location  = "";
     Timer timer = new Timer( );
     public List<NoxReading> readingsLog = new ArrayList();
+    private ORB orb;
+    private NamingContextExt nameService;
+    static private String registeredLS;
 
 
     @Override
@@ -75,13 +81,23 @@ class MonitoringStationImpl extends MonitoringStationPOA {
             @Override
             public void run() {
                 NoxReading reading = get_reading();
-                if(reading.reading_value > 90){
+                if(reading.reading_value > 20){
                     System.out.println("ALARM!!!!!!!!");
+                    raiseAlarm(reading);
                 }
                 readingsLog.add(reading);
                 System.out.println(reading.reading_value);
             }
         }, 1000,5000);
+    }
+
+    private void raiseAlarm(NoxReading reading){
+        try {
+            RegionalCentre lsServant = RegionalCentreHelper.narrow(nameService.resolve_str("LS1"));
+            lsServant.raise_alarm(reading);
+        } catch (CannotProceed | InvalidName | NotFound cannotProceed) {
+            cannotProceed.printStackTrace();
+        }
     }
 
     @Override
@@ -92,6 +108,34 @@ class MonitoringStationImpl extends MonitoringStationPOA {
     @Override
     public void reset() {
         readingsLog.clear();
+    }
+
+    public MonitoringStationImpl(ORB orb_val) {
+        try {
+            orb = orb_val;
+            // Get a reference to the Naming service
+            org.omg.CORBA.Object nameServiceObj = orb.resolve_initial_references ("NameService");
+            if (nameServiceObj == null) {
+                System.out.println("nameServiceObj = null");
+                return;
+            }
+
+            // Use NamingContextExt which is part of the Interoperable
+            // Naming Service (INS) specification.
+            nameService = NamingContextExtHelper.narrow(nameServiceObj);
+            if (nameService == null) {
+                System.out.println("nameService = null");
+                return;
+            }
+
+        } catch (Exception e) {
+            System.out.println("ERROR : " + e) ;
+            e.printStackTrace(System.out);
+        }
+    }
+
+    public static void setRegisteredLS(String LSName){
+        registeredLS = LSName;
     }
 
 
@@ -110,7 +154,7 @@ public class MonitoringStation {
             rootpoa.the_POAManager().activate();
 
             //Regional Center Setup
-            MonitoringStationImpl monitoringStation = setUpMonitoringStation();
+            MonitoringStationImpl monitoringStation = setUpMonitoringStation(orb);
 
             // get object reference from the servant
             org.omg.CORBA.Object ref = rootpoa.servant_to_reference(monitoringStation);
@@ -157,9 +201,8 @@ public class MonitoringStation {
         }
     }
     //Setup Monitoring Station
-    private static MonitoringStationImpl setUpMonitoringStation(){
-        // Create the Count servant object
-        MonitoringStationImpl regionalCenter = new MonitoringStationImpl();
+    private static MonitoringStationImpl setUpMonitoringStation(ORB orb){
+        MonitoringStationImpl ms = new MonitoringStationImpl(orb);
         System.out.println("Setting up Monitoring Station");
 
         Scanner in = new Scanner(System.in);
@@ -168,15 +211,15 @@ public class MonitoringStation {
 
         String stationName = in.nextLine();
 
-        regionalCenter.name(stationName);
+        ms.name(stationName);
 
         System.out.println("Station Location:");
 
         String stationLocation = in.nextLine();
 
-        regionalCenter.location(stationLocation);
+        ms.location(stationLocation);
 
-        return regionalCenter;
+        return ms;
     }
 
     //Setup Register With Regional Center
@@ -205,6 +248,8 @@ public class MonitoringStation {
             System.out.println("Name of the local server you want to register with:");
 
             String regionalCenterName = in.nextLine();
+            //Set lS name variable
+            MonitoringStationImpl.setRegisteredLS(regionalCenterName);
 
             try {
                 RegionalCentre regionalCentre = RegionalCentreHelper.narrow(nameService.resolve_str(regionalCenterName));

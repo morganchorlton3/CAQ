@@ -37,6 +37,7 @@ module CAQ {
         attribute string name;
         attribute string location;
         void takeReadings();
+        void raise_alarm(in NoxReading reading);
         void add_monitoring_station(in string station_name, in string station_location);
     };
 

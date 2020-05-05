@@ -1,6 +1,7 @@
 package MonitoringCenter;
 
 import CAQ.*;
+import LocalServer.LocalServer;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
@@ -157,7 +159,8 @@ public class MonitoringCenter extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MonitoringCenter.fxml"));
         primaryStage.setTitle("CAQ Monitoring Station");
-        primaryStage.setScene(new Scene(root, 500, 500));
+        Scene scene = new Scene(root, 800, 500);
+        primaryStage.setScene(scene);
         primaryStage.show();
 
     }
