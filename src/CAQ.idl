@@ -33,18 +33,20 @@ module CAQ {
     interface RegionalCentre {
         typedef sequence<Station> station_list;
         typedef sequence<NoxReading> Log_of_alarm_readings;
-        typedef sequence<NoxReading> Set_of_Readings;
+        readonly attribute Set_of_Readings readingsLog;
         attribute string name;
         attribute string location;
-        readonly attribute Log_of_alarm_readings log;
         void takeReadings();
         void add_monitoring_station(in string station_name, in string station_location);
     };
 
     //Monitoring Center
     interface MonitoringCenter {
+        typedef sequence<NoxReading> Set_of_Readings;
         void raise_alarm(in NoxReading alarm_reading);
+        readonly attribute Set_of_Readings readingsLog;
         void register_agency(in string who, in string contact_details, in string area_of_interest);
         void register_local_server(in string server_name);
+        void takeReadings(in string name);
     };
 };

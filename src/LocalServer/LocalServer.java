@@ -30,6 +30,12 @@ class RegionalCenterServant extends RegionalCentrePOA {
     public List<NoxReading> stationReadings = new ArrayList();
 
     @Override
+    public NoxReading[] readingsLog() {
+        takeReadings();
+        return stationReadings.toArray(new NoxReading[0]);
+    }
+
+    @Override
     public String name() {
         return stationName;
     }
@@ -48,11 +54,6 @@ class RegionalCenterServant extends RegionalCentrePOA {
     }
 
     @Override
-    public NoxReading[] log() {
-        return new NoxReading[0];
-    }
-
-    @Override
     public void takeReadings(){
         for (int i = 0; i < stationList.size(); i++) {
             String name = stationList.get(i).name;
@@ -60,6 +61,7 @@ class RegionalCenterServant extends RegionalCentrePOA {
             try {
                 MonitoringStation msServant = MonitoringStationHelper.narrow(nameService.resolve_str(name));
                 ArrayList<NoxReading> collectedReadings = new ArrayList<>(Arrays.asList(msServant.readingsLog()));
+                msServant.reset();
                 for (int j = 0; j < collectedReadings.size(); j++) {
                     stationReadings.add(collectedReadings.get(j));
                 }
@@ -153,9 +155,9 @@ public class LocalServer {
             NameComponent[] countName = nameService.to_name(regionalCenter.name());
             nameService.rebind(countName, cref);
 
-            //System.out.println("Registering with the Monitoring Center");
+            System.out.println("Registering with the Monitoring Center");
 
-            //registerWithRegionalCenter(orb,regionalCenter.name());
+            registerWithRegionalCenter(orb,regionalCenter.name());
 
             System.out.println("Local Server Ready...");
 

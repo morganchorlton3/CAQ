@@ -1,10 +1,11 @@
-import CAQ.RegionalCentre;
-import CAQ.RegionalCentreHelper;
+import CAQ.*;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class testClient {
     public static void main(String[] args) {
@@ -30,10 +31,13 @@ public class testClient {
             }
 
             // resolve the Count object reference in the Naming service
-            String name = "LS1";
-            RegionalCentre counter = RegionalCentreHelper.narrow(nameService.resolve_str(name));
-            System.out.println("Ready ");
-            counter.takeReadings();
+            String name = "MonitoringCenter";
+            MonitoringCenter counter = MonitoringCenterHelper.narrow(nameService.resolve_str(name));
+            counter.takeReadings("LS1");
+            ArrayList<NoxReading> collectedReadings = new ArrayList<>(Arrays.asList(counter.readingsLog()));
+            for (int i = 0; i < collectedReadings.size(); i++) {
+                System.out.println(collectedReadings.get(i).reading_value);
+            }
 
         } catch(Exception e) {
             System.err.println("Exception");
