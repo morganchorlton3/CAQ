@@ -58,7 +58,8 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
 
     @Override
     public void raise_alarm(NoxReading alarm_reading) {
-
+        System.out.println("Alarm Recived");
+        MonitoringCenterController.raiseAlarm(alarm_reading);
     }
 
     @Override

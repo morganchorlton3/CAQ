@@ -1,13 +1,13 @@
 package LocalServer;
 
 import CAQ.*;
-import org.jacorb.tao_imr.ImplementationRepository.NotFound;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.InvalidName;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
@@ -28,6 +28,8 @@ class RegionalCenterServant extends RegionalCentrePOA {
     public List<Station> stationList = new ArrayList();
 
     public List<NoxReading> stationReadings = new ArrayList();
+
+    public List<NoxReading> alarmLog = new ArrayList<>();
 
     @Override
     public NoxReading[] readingsLog() {
@@ -81,7 +83,16 @@ class RegionalCenterServant extends RegionalCentrePOA {
 
     @Override
     public void raise_alarm(NoxReading reading) {
+        //Add to log
+        alarmLog.add(reading);
         System.out.println("ALARM RECIVED");
+        //Alert MC
+        try {
+            MonitoringCenter mcServant = MonitoringCenterHelper.narrow(nameService.resolve_str("MonitoringCenter"));
+            mcServant.raise_alarm(reading);
+        } catch (CannotProceed | InvalidName | NotFound cannotProceed) {
+            cannotProceed.printStackTrace();
+        }
     }
 
     @Override
@@ -160,9 +171,9 @@ public class LocalServer {
             NameComponent[] countName = nameService.to_name(regionalCenter.name());
             nameService.rebind(countName, cref);
 
-            //System.out.println("Registering with the Monitoring Center");
+            System.out.println("Registering with the Monitoring Center");
 
-            //registerWithRegionalCenter(orb,regionalCenter.name());
+            registerWithRegionalCenter(orb,regionalCenter.name());
 
             System.out.println("Local Server Ready...");
 

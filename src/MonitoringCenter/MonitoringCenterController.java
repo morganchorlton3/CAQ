@@ -2,6 +2,7 @@ package MonitoringCenter;
 import CAQ.*;
 import CAQ.MonitoringCenter;
 import MonitoringStation.MonitoringStation;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -97,6 +98,21 @@ public class MonitoringCenterController implements Initializable {
         }
         readingsTitle.setText("Readings From " + lsName);
         updateReadings();
+    }
+
+    public static void raiseAlarm(NoxReading reading){
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("High Reading");
+
+            String  toAdd =  "MS: " + reading.station_name + " has received a high reading of: " + reading.reading_value;
+
+            // Header Text: null
+            alert.setHeaderText(null);
+            alert.setContentText(toAdd);
+
+            alert.show();
+        });
     }
 
 
