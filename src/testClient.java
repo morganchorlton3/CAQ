@@ -33,11 +33,9 @@ public class testClient {
 
             // resolve the Count object reference in the Naming service
             String name = "MonitoringCenter";
-            MonitoringCenter counter = MonitoringCenterHelper.narrow(nameService.resolve_str(name));
-            List<Station> lst = Arrays.asList(counter.localServers());
-            for(Station s: lst){
-                System.out.println(s.name);
-            }
+            MonitoringStation counter = MonitoringStationHelper.narrow(nameService.resolve_str("MS1"));
+            counter.deactivate();
+
 
         } catch(Exception e) {
             System.err.println("Exception");
