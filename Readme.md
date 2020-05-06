@@ -35,7 +35,7 @@ Generate IDL code
     
 To run the Monitoring station (GUI) you may need to add this VM argument
 
-    --module-path Path to openFX/ JFX --add-modules=javafx.controls,javafx.fxml
+    --module-path Path to openFX/ JFX --add-modules=javafx.controls,javafx.fxmlc
 
 Add to program arguments:
 
