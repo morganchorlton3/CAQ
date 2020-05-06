@@ -178,7 +178,10 @@ public class LocalServer {
 
             System.out.println("Registering with the Monitoring Center");
 
-            registerWithRegionalCenter(orb,regionalCenter.name());
+            //create station object
+            Station station = new Station(regionalCenter.name(), regionalCenter.location());
+
+            registerWithRegionalCenter(orb,station);
 
             System.out.println("Local Server Ready...");
 
@@ -219,7 +222,7 @@ public class LocalServer {
     }
 
     //Setup Register With Monitoring Center
-    private static void registerWithRegionalCenter(ORB orb,String serverName){
+    private static void registerWithRegionalCenter(ORB orb,Station station){
         System.out.println("Registering with Monitoring Center");
         try {
             // Get a reference to the Naming service
@@ -240,7 +243,7 @@ public class LocalServer {
 
             try {
                 MonitoringCenter monitoringCenter = MonitoringCenterHelper.narrow(nameService.resolve_str("MonitoringCenter"));
-                monitoringCenter.register_local_server(serverName);
+                monitoringCenter.register_local_server(station);
             }catch (Exception e){
                 System.out.println("Monitoring Center not found");
             }

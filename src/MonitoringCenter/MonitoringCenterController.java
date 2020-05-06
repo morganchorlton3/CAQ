@@ -78,9 +78,13 @@ public class MonitoringCenterController implements Initializable {
 
     public static void updateLocalServerList()
     {
-        List<String> stationList = MonitoringCenterImpl.getLocalServerList();
-        lsList.clear();
-        lsList.addAll(stationList);
+        Platform.runLater(() -> {
+            List<Station> stationList = MonitoringCenterImpl.getLocalServerList();
+            lsList.clear();
+            for(Station s: stationList) {
+                lsList.add(s.name);
+            }
+        });
     }
     public static void updateReadings()
     {
@@ -150,7 +154,7 @@ public class MonitoringCenterController implements Initializable {
     @FXML
     private void ViewStations(ActionEvent event) throws IOException {
         lsName = lsListView.getSelectionModel().getSelectedItem();
-        StationsController.setLSName(lsName);
+        //StationsController.setLSName(lsName);
         try {
             // Get a reference to the Naming service
             org.omg.CORBA.Object nameServiceObj = orb.resolve_initial_references("NameService");

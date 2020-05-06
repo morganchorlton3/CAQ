@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Agency" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="Agency.Agency" />
+    <module name="CAQ" />
+    <option name="PROGRAM_PARAMETERS" value="-ORBInitRef.NameService=file:$PROJECT_DIR$/../../name.ior" />
+    <option name="VM_PARAMETERS" value="-Djacorb.log.default.verbosity=2 -Djava.rmi.server.useCodebaseOnly=false --module-path $USER_HOME$/src/javafx-sdk-11.0.2/lib --add-modules=javafx.controls,javafx.fxml" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="MonitoringCenter.Agencies.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

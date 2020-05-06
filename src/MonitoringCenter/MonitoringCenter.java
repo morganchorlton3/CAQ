@@ -23,13 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 class MonitoringCenterImpl extends MonitoringCenterPOA {
 
     private ORB orb;
     private NamingContextExt nameService;
 
-    static List<String> localServerList = new ArrayList<>();
+     static List<Station> localServerList = new ArrayList<>();
     static List<NoxReading> readingsLog = new ArrayList<>();
 
     public MonitoringCenterImpl(ORB orb_val) {
@@ -57,6 +56,11 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     }
 
     @Override
+    public Station[] localServers() {
+        return localServerList.toArray(new Station[0]);
+    }
+
+    @Override
     public void raise_alarm(NoxReading alarm_reading) {
         System.out.println("Alarm Recived");
         MonitoringCenterController.raiseAlarm(alarm_reading);
@@ -68,10 +72,10 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     }
 
     @Override
-    public void register_local_server(String server_name) {
-        localServerList.add(server_name);
+    public void register_local_server(Station station) {
+        localServerList.add(station);
         MonitoringCenterController.updateLocalServerList();
-        System.out.println(server_name + " has successfully been registered");
+        System.out.println(station.name + " has successfully been registered");
     }
 
     @Override
@@ -80,6 +84,7 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
             System.out.println(name);
             RegionalCentre lsServant = RegionalCentreHelper.narrow(nameService.resolve_str(name));
             ArrayList<NoxReading> collectedReadings = new ArrayList<>(Arrays.asList(lsServant.readingsLog()));
+            readingsLog.clear();
             for (int i = 0; i < collectedReadings.size(); i++) {
                 readingsLog.add(collectedReadings.get(i));
             }
@@ -89,16 +94,16 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
         }
     }
 
-
-    public static List<String> getLocalServerList() {
-        return localServerList;
-    }
-
     public static List<NoxReading> getReadingsList() {
         return readingsLog;
     }
 
+    public static List<Station> getLocalServerList() {
+        return localServerList;
+    }
+
 }
+
 
 public class MonitoringCenter extends Application {
 

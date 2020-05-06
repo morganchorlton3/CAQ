@@ -6,6 +6,7 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class testClient {
     public static void main(String[] args) {
@@ -33,7 +34,10 @@ public class testClient {
             // resolve the Count object reference in the Naming service
             String name = "MonitoringCenter";
             MonitoringCenter counter = MonitoringCenterHelper.narrow(nameService.resolve_str(name));
-            counter.takeReadings("Ls1");
+            List<Station> lst = Arrays.asList(counter.localServers());
+            for(Station s: lst){
+                System.out.println(s.name);
+            }
 
         } catch(Exception e) {
             System.err.println("Exception");

@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="testClient" type="Application" factoryName="Application" singleton="false" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="testClient" />
+    <module name="CAQ" />
+    <option name="PROGRAM_PARAMETERS" value="-ORBInitRef.NameService=file:$PROJECT_DIR$/../../name.ior" />
+    <option name="VM_PARAMETERS" value="-Djacorb.log.default.verbosity=2" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
