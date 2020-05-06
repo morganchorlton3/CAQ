@@ -90,6 +90,7 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     @Override
     public void register_monitoring_station(Station station_name) {
         monitoringStationList.add(station_name);
+        MonitoringCenterController.updateMonitoringStations();
     }
 
     @Override
