@@ -11,6 +11,12 @@ module CAQ {
         string location;
     };
 
+    struct Agency {
+        string name;
+        string locationOfInterest;
+        string contactNumber;
+    };
+
     typedef sequence<NoxReading> Log_of_alarm_readings;
     typedef sequence<NoxReading> Set_of_Readings;
 
@@ -45,11 +51,13 @@ module CAQ {
     //Monitoring Center
     interface MonitoringCenter {
         typedef sequence<NoxReading> Set_of_Readings;
-        typedef sequence<Station> lsList;
-        readonly attribute lsList localServers;
+        typedef sequence<Station> stationList;
+        readonly attribute stationList localServers;
+        readonly attribute stationList monitoringStations;
         void raise_alarm(in NoxReading alarm_reading);
-        void register_agency(in string who, in string contact_details, in string area_of_interest);
+        void register_agency(in Agency agencyObject);
         void register_local_server(in Station station_name);
+        void register_monitoring_station(in Station station_name);
         void takeReadings(in string name);
 
     };

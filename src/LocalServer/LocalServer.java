@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import static MonitoringCenter.MonitoringCenterController.updateMonitoringStations;
+
 class RegionalCenterServant extends RegionalCentrePOA {
 
     private ORB orb;
@@ -76,12 +78,8 @@ class RegionalCenterServant extends RegionalCentrePOA {
                     System.out.println("Station Name: " + stationReadings.get(k).station_name + " Reading: " +
                             stationReadings.get(k).reading_value);
                 }
-            } catch (CannotProceed cannotProceed) {
+            } catch (CannotProceed | InvalidName | NotFound cannotProceed) {
                 cannotProceed.printStackTrace();
-            } catch (InvalidName invalidName) {
-                invalidName.printStackTrace();
-            } catch (org.omg.CosNaming.NamingContextPackage.NotFound notFound) {
-                notFound.printStackTrace();
             }
         }
     }
@@ -105,8 +103,12 @@ class RegionalCenterServant extends RegionalCentrePOA {
         System.out.println("Adding To List");
         Station station = new Station(station_name, station_location);
         stationList.add(station);
-        for (int i = 0; i < stationList.size(); i++) {
-            System.out.println(stationList.get(i).name);
+        try {
+            System.out.println("Adding station");
+            MonitoringCenter mcServant = MonitoringCenterHelper.narrow(nameService.resolve_str("MonitoringCenter"));
+            mcServant.register_monitoring_station(station);
+        } catch (CannotProceed | InvalidName | NotFound cannotProceed) {
+            cannotProceed.printStackTrace();
         }
     }
 

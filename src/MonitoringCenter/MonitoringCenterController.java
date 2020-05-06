@@ -1,6 +1,8 @@
 package MonitoringCenter;
+
 import CAQ.*;
 import CAQ.MonitoringCenter;
+import LocalServer.LocalServer;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,7 +23,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static MonitoringCenter.MonitoringCenter.getOrb;
@@ -31,12 +32,15 @@ public class MonitoringCenterController implements Initializable {
 
     private static final ObservableList<TableReading> readingsList = FXCollections.observableArrayList ();
     private static final ObservableList<String> lsList = FXCollections.<String>observableArrayList();
-    ObservableList<String> msList = FXCollections.observableArrayList();
+    private static final ObservableList<String> agenciesList = FXCollections.<String>observableArrayList();
+    private static final ObservableList<String> msList = FXCollections.observableArrayList();
 
     @FXML
     private ListView<String> lsListView;
     @FXML
     private ListView<String> msListView;
+    @FXML
+    private ListView<String> agenciesListView;
     @FXML
     private Button getReadingBtn, viewStationsBTN;
     @FXML
@@ -58,21 +62,22 @@ public class MonitoringCenterController implements Initializable {
     private TableColumn<TableReading, String> timeCol;
 
 
-    private ORB orb = getOrb();
-    private NamingContextExt nameService;
+    private static ORB orb = getOrb();
+    private static NamingContextExt nameService;
 
-    static private String lsName;
+    //static private String lsName;
 
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
         lsListView.setItems(lsList);
+        agenciesListView.setItems(agenciesList);
+        msListView.setItems(msList);
         //Readings Table
         stationNameCol.setCellValueFactory(new PropertyValueFactory<TableReading,String>("station_name"));
         readingCol.setCellValueFactory(new PropertyValueFactory<TableReading,Integer>("reading_value"));
         dateCol.setCellValueFactory(new PropertyValueFactory<TableReading,String>("date"));
         timeCol.setCellValueFactory(new PropertyValueFactory<TableReading,String>("time"));
-
         readingsTable.setItems(readingsList);
     }
 
@@ -86,6 +91,7 @@ public class MonitoringCenterController implements Initializable {
             }
         });
     }
+
     public static void updateReadings()
     {
         List<NoxReading> collectedReadings = MonitoringCenterImpl.getReadingsList();
@@ -98,6 +104,29 @@ public class MonitoringCenterController implements Initializable {
         }
         readingsList.clear();
         readingsList.addAll(readings);
+    }
+
+    public static void updateMonitoringStations()
+    {
+        Platform.runLater(() -> {
+            List<Station> stationList = MonitoringCenterImpl.getMonitoringStationList();
+            msList.clear();
+            for(Station s: stationList) {
+                System.out.println(s.name);
+                msList.add(s.name);
+            }
+        });
+    }
+
+    public static void updateAgencies()
+    {
+        Platform.runLater(() -> {
+            List<Agency> listToAdd = MonitoringCenterImpl.getAgenciesList();
+            lsList.clear();
+            for(Agency a: listToAdd) {
+                agenciesList.add("Name: " + a.name + " Area: " + a.locationOfInterest + " Contact: " + a.contactNumber);
+            }
+        });
     }
 
 
@@ -153,43 +182,9 @@ public class MonitoringCenterController implements Initializable {
     //View Stations
     @FXML
     private void ViewStations(ActionEvent event) throws IOException {
-        lsName = lsListView.getSelectionModel().getSelectedItem();
-        //StationsController.setLSName(lsName);
-        try {
-            // Get a reference to the Naming service
-            org.omg.CORBA.Object nameServiceObj = orb.resolve_initial_references("NameService");
-            if (nameServiceObj == null) {
-                System.out.println("nameServiceObj = null");
-                return;
-            }
-
-            // Use NamingContextExt which is part of the Interoperable
-            // Naming Service (INS) specification.
-            nameService = NamingContextExtHelper.narrow(nameServiceObj);
-            if (nameService == null) {
-                System.out.println("nameService = null");
-                return;
-            }
-
-        } catch (Exception e) {
-            System.out.println("ERROR : " + e);
-            e.printStackTrace(System.out);
-        }
-        try {
-            RegionalCentre lsServant = RegionalCentreHelper.narrow(nameService.resolve_str(lsName));
-            lsServant.stations();
-            ArrayList<Station> stations = new ArrayList<>(Arrays.asList(lsServant.stations()));
-            for (Station station : stations) {
-                //TableReading ms = new TableReading(station.name, station.location);
-                //msList.add(ms);
-            }
-
-            //nameCol.setCellValueFactory(new PropertyValueFactory<>("Name"));
-           // locationCol.setCellValueFactory(new PropertyValueFactory<>("Location"));
-
-            //readingsTable.setItems(msList);
-        } catch (CannotProceed | InvalidName | NotFound cannotProceed) {
-            cannotProceed.printStackTrace();
+        System.out.println(msList);
+        for (int i = 0; i < msList.size(); i++) {
+            System.out.println(msList.get(i));
         }
     }
 

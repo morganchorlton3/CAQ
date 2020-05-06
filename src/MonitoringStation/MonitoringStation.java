@@ -93,7 +93,7 @@ class MonitoringStationImpl extends MonitoringStationPOA {
 
     private void raiseAlarm(NoxReading reading){
         try {
-            RegionalCentre lsServant = RegionalCentreHelper.narrow(nameService.resolve_str("LS1"));
+            RegionalCentre lsServant = RegionalCentreHelper.narrow(nameService.resolve_str(registeredLS));
             lsServant.raise_alarm(reading);
         } catch (CannotProceed | InvalidName | NotFound cannotProceed) {
             cannotProceed.printStackTrace();
@@ -189,7 +189,7 @@ public class MonitoringStation {
                             "Location: " + monitoringStation.location() + '\n'
             );
 
-            registerWithRegionalCenter(orb, monitoringStation.name(), monitoringStation.location());
+            registerWithRegionalCenter(orb, monitoringStation.name, monitoringStation.location);
 
             monitoringStation.activate();
             //  wait for invocations from clients

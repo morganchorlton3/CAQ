@@ -28,8 +28,10 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     private ORB orb;
     private NamingContextExt nameService;
 
-     static List<Station> localServerList = new ArrayList<>();
+    static List<Station> localServerList = new ArrayList<>();
     static List<NoxReading> readingsLog = new ArrayList<>();
+    static List<Station> monitoringStationList = new ArrayList<>();
+    static List<Agency> RegisteredAgenciesList = new ArrayList<>();
 
     public MonitoringCenterImpl(ORB orb_val) {
         try {
@@ -61,21 +63,33 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     }
 
     @Override
+    public Station[] monitoringStations() {
+        return localServerList.toArray(new Station[0]);
+    }
+
+    @Override
     public void raise_alarm(NoxReading alarm_reading) {
         System.out.println("Alarm Recived");
         MonitoringCenterController.raiseAlarm(alarm_reading);
     }
 
     @Override
-    public void register_agency(String who, String contact_details, String area_of_interest) {
-
+    public void register_agency(Agency agencyObject) {
+        RegisteredAgenciesList.add(agencyObject);
+        MonitoringCenterController.updateAgencies();
     }
+
 
     @Override
     public void register_local_server(Station station) {
         localServerList.add(station);
         MonitoringCenterController.updateLocalServerList();
         System.out.println(station.name + " has successfully been registered");
+    }
+
+    @Override
+    public void register_monitoring_station(Station station_name) {
+        monitoringStationList.add(station_name);
     }
 
     @Override
@@ -102,12 +116,21 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
         return localServerList;
     }
 
+    public static List<Agency> getAgenciesList() {
+        return RegisteredAgenciesList;
+    }
+
+    public static List<Station> getMonitoringStationList() {
+        return monitoringStationList;
+    }
+
 }
 
 
 public class MonitoringCenter extends Application {
 
     public static ORB orb;
+    public static NamingContextExt nameService;
 
     static public void main(String[] args) {
         try {
@@ -135,7 +158,7 @@ public class MonitoringCenter extends Application {
 
             // Use NamingContextExt which is part of the Interoperable
             // Naming Service (INS) specification.
-            NamingContextExt nameService = NamingContextExtHelper.narrow(nameServiceObj);
+            nameService = NamingContextExtHelper.narrow(nameServiceObj);
             if (nameService == null) {
                 System.out.println("nameService = null");
                 return;
@@ -165,8 +188,12 @@ public class MonitoringCenter extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MonitoringCenter.fxml"));
         primaryStage.setTitle("CAQ Monitoring Station");
-        Scene scene = new Scene(root, 800, 500);
+        Scene scene = new Scene(root, 1000, 700);
         primaryStage.setScene(scene);
+        primaryStage.setMinWidth(1000);
+        primaryStage.setMinHeight(700);
+        primaryStage.setMaxWidth(1000);
+        primaryStage.setMaxHeight(700);
         primaryStage.show();
     }
 
