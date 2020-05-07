@@ -68,10 +68,11 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     }
 
     @Override
-    public void raise_alarm(NoxReading alarm_reading) {
+    public void raise_alarm(NoxReading alarm_reading, String lsName) {
         System.out.println("Alarm Recived");
-        MonitoringCenterController.raiseAlarm(alarm_reading);
+        MonitoringCenterController.raiseAlarm(alarm_reading, lsName);
     }
+
 
     @Override
     public void register_agency(Agency agencyObject) {
@@ -189,11 +190,11 @@ public class MonitoringCenter extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MonitoringCenter.fxml"));
         primaryStage.setTitle("CAQ Monitoring Station");
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(root, 1300, 700);
         primaryStage.setScene(scene);
-        primaryStage.setMinWidth(1000);
+        primaryStage.setMinWidth(1300);
         primaryStage.setMinHeight(700);
-        primaryStage.setMaxWidth(1000);
+        primaryStage.setMaxWidth(1300);
         primaryStage.setMaxHeight(700);
         primaryStage.show();
     }

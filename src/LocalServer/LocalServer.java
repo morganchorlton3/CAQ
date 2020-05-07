@@ -92,7 +92,7 @@ class RegionalCenterServant extends RegionalCentrePOA {
         //Alert MC
         try {
             MonitoringCenter mcServant = MonitoringCenterHelper.narrow(nameService.resolve_str("MonitoringCenter"));
-            mcServant.raise_alarm(reading);
+            mcServant.raise_alarm(reading, stationName);
         } catch (CannotProceed | InvalidName | NotFound cannotProceed) {
             cannotProceed.printStackTrace();
         }

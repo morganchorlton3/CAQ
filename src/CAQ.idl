@@ -54,7 +54,7 @@ module CAQ {
         typedef sequence<Station> stationList;
         readonly attribute stationList localServers;
         readonly attribute stationList monitoringStations;
-        void raise_alarm(in NoxReading alarm_reading);
+        void raise_alarm(in NoxReading alarm_reading, in string lsName);
         void register_agency(in Agency agencyObject);
         void register_local_server(in Station station_name);
         void register_monitoring_station(in Station station_name);

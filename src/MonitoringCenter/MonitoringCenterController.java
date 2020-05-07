@@ -31,14 +31,12 @@ import static MonitoringCenter.MonitoringCenter.getOrb;
 public class MonitoringCenterController implements Initializable {
 
     private static final ObservableList<TableReading> readingsList = FXCollections.observableArrayList ();
-    private static final ObservableList<String> lsList = FXCollections.<String>observableArrayList();
-    private static final ObservableList<String> agenciesList = FXCollections.<String>observableArrayList();
+    private static final ObservableList<TableLS> lsList = FXCollections.observableArrayList();
+    private static final ObservableList<TableAgency> agenciesList = FXCollections.observableArrayList();
     private static final ObservableList<TableMS> msList = FXCollections.observableArrayList();
 
     @FXML
     private ListView<String> lsListView;
-    @FXML
-    private ListView<String> agenciesListView;
     @FXML
     private Button getReadingBtn, viewStationsBTN;
     @FXML
@@ -64,6 +62,22 @@ public class MonitoringCenterController implements Initializable {
     @FXML
     private TableColumn<TableMS, Boolean> msStatusCol;
 
+    @FXML
+    private TableView<TableAgency> agencyTable;
+    @FXML
+    private TableColumn<TableAgency, String> aNameCol;
+    @FXML
+    private TableColumn<TableAgency, String> aLocationCol;
+    @FXML
+    private TableColumn<TableAgency, String> aContactInfoCol;
+
+    @FXML
+    private TableView<TableLS> lsTable;
+    @FXML
+    private TableColumn<TableLS, String> lsNameCol;
+    @FXML
+    private TableColumn<TableLS, String> lsLocationCol;
+
 
     private static ORB orb = getOrb();
     private static NamingContextExt nameService;
@@ -73,20 +87,28 @@ public class MonitoringCenterController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
-        lsListView.setItems(lsList);
-        agenciesListView.setItems(agenciesList);
         //Readings Table
         stationNameCol.setCellValueFactory(new PropertyValueFactory<TableReading,String>("station_name"));
         readingCol.setCellValueFactory(new PropertyValueFactory<TableReading,Integer>("reading_value"));
         dateCol.setCellValueFactory(new PropertyValueFactory<TableReading,String>("date"));
         timeCol.setCellValueFactory(new PropertyValueFactory<TableReading,String>("time"));
         readingsTable.setItems(readingsList);
+        //ls Table
+        lsNameCol.setCellValueFactory(new PropertyValueFactory<TableLS,String>("name"));
+        lsLocationCol.setCellValueFactory(new PropertyValueFactory<TableLS,String>("location"));
+        lsTable.setItems(lsList);
         //MS Table
         msNameCol.setCellValueFactory(new PropertyValueFactory<TableMS,String>("name"));
         msLocationCol.setCellValueFactory(new PropertyValueFactory<TableMS,String>("location"));
         msStatusCol.setCellValueFactory(new PropertyValueFactory<TableMS, Boolean>("status"));
         msTable.setItems(msList);
-        
+        //Agency Table
+        aNameCol.setCellValueFactory(new PropertyValueFactory<TableAgency,String>("name"));
+        aLocationCol.setCellValueFactory(new PropertyValueFactory<TableAgency,String>("locationOfInterest"));
+        aContactInfoCol.setCellValueFactory(new PropertyValueFactory<TableAgency, String>("contactInfo"));
+        agencyTable.setItems(agenciesList);
+
+
     }
 
     public static void updateLocalServerList()
@@ -95,23 +117,14 @@ public class MonitoringCenterController implements Initializable {
             List<Station> stationList = MonitoringCenterImpl.getLocalServerList();
             lsList.clear();
             for(Station s: stationList) {
-                lsList.add(s.name);
+                TableLS ls = new TableLS(s.name, s.location);
+                lsList.add(ls);
             }
         });
     }
 
     public static void updateReadings()
     {
-        /*List<NoxReading> collectedReadings = MonitoringCenterImpl.getReadingsList();
-        List<TableReading> readings = new ArrayList<>();
-        for (NoxReading reading : collectedReadings) {
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-            DateFormat tf= new SimpleDateFormat("hh:mm:ss");
-            TableReading readingToAdd = new TableReading(tf.format(reading.time), df.format(reading.date), reading.reading_value, reading.station_name);
-            readings.add(readingToAdd);
-        }
-        readingsList.clear();
-        readingsList.addAll(readings);*/
         Platform.runLater(() -> {
             List<NoxReading> collectedReadings = MonitoringCenterImpl.getReadingsList();
             List<TableReading> readings = new ArrayList<>();
@@ -142,9 +155,10 @@ public class MonitoringCenterController implements Initializable {
     {
         Platform.runLater(() -> {
             List<Agency> listToAdd = MonitoringCenterImpl.getAgenciesList();
-            lsList.clear();
+            agenciesList.clear();
             for(Agency a: listToAdd) {
-                agenciesList.add("Name: " + a.name + " Area: " + a.locationOfInterest + " Contact: " + a.contactNumber);
+                TableAgency agency = new TableAgency(a.name,a.locationOfInterest,a.contactNumber);
+                agenciesList.add(agency);
             }
         });
     }
@@ -184,19 +198,24 @@ public class MonitoringCenterController implements Initializable {
         updateReadings();
     }
 
-    public static void raiseAlarm(NoxReading reading){
+    public static void raiseAlarm(NoxReading reading, String lsName){
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("High Reading");
-
             String  toAdd =  reading.station_name + " has received a high reading of: " + reading.reading_value;
-
             // Header Text: null
             alert.setHeaderText(null);
             alert.setContentText(toAdd);
-
             alert.show();
         });
+
+        for (TableAgency agencyToCheck : agenciesList) {
+            {
+                if (agencyToCheck.locationOfInterest.equals(lsName)) {
+                    System.out.println("blah Blah");
+                }
+            }
+        }
     }
 
     //View Stations
