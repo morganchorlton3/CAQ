@@ -209,13 +209,18 @@ public class MonitoringCenterController implements Initializable {
             alert.show();
         });
 
-        for (TableAgency agencyToCheck : agenciesList) {
+        /*for (TableAgency agencyToCheck : agenciesList) {
             {
                 if (agencyToCheck.locationOfInterest.equals(lsName)) {
-                    System.out.println("blah Blah");
+                    try {
+                        AgencyMonitor agencyServant = AgencyMonitorHelper.narrow(nameService.resolve_str(agencyToCheck.name));
+                        agencyServant.raise_alarm(reading);
+                    } catch (CannotProceed | InvalidName | NotFound cannotProceed) {
+                        cannotProceed.printStackTrace();
+                    }
                 }
             }
-        }
+        }*/
     }
 
     //View Stations

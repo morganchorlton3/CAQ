@@ -81,7 +81,7 @@ class MonitoringStationImpl extends MonitoringStationPOA {
             @Override
             public void run() {
                 NoxReading reading = get_reading();
-                if(reading.reading_value > 90){
+                if(reading.reading_value > 20){
                     System.out.println("ALARM!!!!!!!!");
                     raiseAlarm(reading);
                 }

@@ -59,6 +59,12 @@ module CAQ {
         void register_local_server(in Station station_name);
         void register_monitoring_station(in Station station_name);
         void takeReadings(in string name);
-
     };
+
+     interface AgencyMonitor {
+        attribute string name;
+        attribute string locationOfInterest;
+        attribute string contactInfo;
+        void raise_alarm(in NoxReading reading);
+     };
 };

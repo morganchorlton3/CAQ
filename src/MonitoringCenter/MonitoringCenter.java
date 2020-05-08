@@ -70,6 +70,17 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     @Override
     public void raise_alarm(NoxReading alarm_reading, String lsName) {
         System.out.println("Alarm Recived");
+        for (Agency agency : RegisteredAgenciesList) {
+            if (agency.locationOfInterest.equals(lsName)) {
+                System.out.println("Alert Agency");
+                try {
+                    AgencyMonitor agencyServant = AgencyMonitorHelper.narrow(nameService.resolve_str(agency.name));
+                    agencyServant.raise_alarm(alarm_reading);
+                } catch (NotFound | CannotProceed | InvalidName notFound) {
+                    notFound.printStackTrace();
+                }
+            }
+        }
         MonitoringCenterController.raiseAlarm(alarm_reading, lsName);
     }
 
@@ -77,6 +88,7 @@ class MonitoringCenterImpl extends MonitoringCenterPOA {
     @Override
     public void register_agency(Agency agencyObject) {
         RegisteredAgenciesList.add(agencyObject);
+        System.out.println(Arrays.toString(RegisteredAgenciesList.toArray()));
         MonitoringCenterController.updateAgencies();
     }
 
